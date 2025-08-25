@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
+    <link rel="stylesheet" href="css/coordinador.css">
+    <title>Coordinador</title>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <aside>
+            <div class="toggle">
+                <div class="logo">
+                    <img src="imagenes/3.jpg">
+                    <h2><span class="primary">ATP</span></h2>
+                </div>
+                <div class="close" id="close-btn">
+                    <span class="material-icons-sharp">
+                        close
+                    </span>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <a href="#">
+                    <span class="material-icons-sharp">
+                        dashboard
+                    </span>
+                    <h3>Dashboard</h3>
+                </a>
+                <a href="#">
+                    <span class="material-icons-sharp">
+                        person_outline
+                    </span>
+                    <h3>Tenista</h3>
+                </a>
+                <a href="#">
+                    <span class="material-icons-sharp">
+                        person_outline
+                    </span>
+                    <h3>Conductores</h3>
+                </a>
+                <a href="#" class="active">
+                    <span class="material-icons-sharp">
+                        insights
+                    </span>
+                    <h3>Analisis</h3>
+                </a>
+                <a href="#">
+                    <span class="material-icons-sharp">
+                        receipt_long
+                    </span>
+                    <h3>Historial</h3>
+                </a>
+                <a href="#">
+                    <span class="material-icons-sharp">
+                        logout
+                    </span>
+                    <h3>Cerrar Sesión</h3>
+                </a>
+            </div>
+        </aside>
+
+
+        <main>
+            <h1>Analisis</h1>
+
+            <div class="analyse">
+                <div class="sales">
+                    <div class="status">
+                        <div class="info">
+                            <h3>Kilometros recorridos</h3>
+                            <h1>625 KM</h1>
+                        </div>
+                        <div class="progresss">
+                            <svg>
+                                <circle cx="38" cy="38" r="36"></circle>
+                            </svg>
+                            <div class="percentage">
+                                <p>+64%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="visits">
+                    <div class="status">
+                        <div class="info">
+                            <h3>Viajes Coordinados</h3>
+                            <h1>14</h1>
+                        </div>
+                        <div class="progresss">
+                            <svg>
+                                <circle cx="38" cy="38" r="36"></circle>
+                            </svg>
+                            <div class="percentage">
+                                <p>68%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="searches">
+                    <div class="status">
+                        <div class="info">
+                            <h3>Viajes Totales</h3>
+                            <h1>320</h1>
+                        </div>
+                        <div class="progresss">
+                            <svg>
+                                <circle cx="38" cy="38" r="36"></circle>
+                            </svg>
+                            <div class="percentage">
+                                <p>+21%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="new-users">
+                <h2>Conductores</h2>
+                <div class="user-list">
+                    <div class="user">
+                        <img src="imagenes/p1.jpg">
+                        <h2>Jack</h2>
+                    </div>
+                    <div class="user">
+                        <img src="imagenes/p2.jpg">
+                        <h2>Amir</h2>
+                    </div>
+                    <div class="user">
+                        <img src="imagenes/p3.jpg">
+                        <h2>Jose</h2>
+                    </div>
+                    <div class="user">
+                        <img src="imagenes/p4.jpg">
+                        <h2>Pedro</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="recent-orders">
+                <h2>Viajes Recientes</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tenista</th>
+                            <th>Origen</th>
+                            <th>Conductor</th>
+                            <th>Destino</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <a href="#">Mostar todos</a>
+            </div>
+
+        </main>
+
+        <div class="right-section">
+            <div class="nav">
+                <button id="menu-btn">
+                    <span class="material-icons-sharp">
+                        menu
+                    </span>
+                </button>
+                <div class="dark-mode">
+                    <span class="material-icons-sharp active">
+                        light_mode
+                    </span>
+                    <span class="material-icons-sharp">
+                        dark_mode
+                    </span>
+                </div>
+
+                <div class="profile">
+                    <div class="info">
+                        <p>Hola, <b>Jaime</b></p>
+                        <small class="text-muted">Coordinador</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <script src="/js/registro.js"></script>
+    <script src="/js/coordinador.js"></script>
+</body>
+
+</html>
