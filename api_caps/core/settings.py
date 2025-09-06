@@ -165,11 +165,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
-    "trivia-jobs-yamaha-antibodies.trycloudflare.com",
+    "massive-doe-set-fioricet.trycloudflare.com",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://trivia-jobs-yamaha-antibodies.trycloudflare.com",
+    "https://massive-doe-set-fioricet.trycloudflare.com",
 ]
 
 WEBHOOK_TOKEN = os.getenv("WEBHOOK_TOKEN", "whatsapp333")
