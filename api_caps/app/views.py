@@ -1,6 +1,8 @@
 from django.shortcuts import render
-
 # Create your views here.
+from rest_framework import generics, permissions
+from .models import Solicitud, Conductor
+from .serializers import SolicitudListSerializer, ConductorListSerializer
 from rest_framework import viewsets, filters
 from rest_framework.permissions import AllowAny
 from .models import (
@@ -75,3 +77,14 @@ class ReservaViewSet(BaseViewSet):
         if self.action in ["list", "retrieve"]:
             return ReservaReadNestedSerializer
         return ReservaWriteSerializer
+
+
+class SolicitudListAPI(generics.ListAPIView):
+    queryset = Solicitud.objects.select_related("tenista", "origen", "destino").order_by("-created_at", "-id")
+    serializer_class = SolicitudListSerializer
+    permission_classes = [permissions.AllowAny]  # o cambia a IsAuthenticated
+
+class ConductorListAPI(generics.ListAPIView):
+    queryset = Conductor.objects.all().order_by("-id")
+    serializer_class = ConductorListSerializer
+    permission_classes = [permissions.AllowAny]

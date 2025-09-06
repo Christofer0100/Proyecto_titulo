@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from rest_framework import serializers
+from .models import Solicitud, Conductor
 from .models import (
     Coordinador, Conductor, Tenista, Origen, Destino,
     Solicitud, Reserva
@@ -109,3 +111,22 @@ class ReservaWriteSerializer(serializers.ModelSerializer):
         # if fh and fh.minute not in (0, 30):
         #     raise serializers.ValidationError("La hora debe ser en punto o y media.")
         return attrs
+
+
+class SolicitudListSerializer(serializers.ModelSerializer):
+    tenista_numero = serializers.CharField(source="tenista.numero", allow_null=True)
+    origen = serializers.CharField(source="origen.salida", allow_null=True)
+    destino = serializers.CharField(source="destino.lugar", allow_null=True)
+
+    class Meta:
+        model = Solicitud
+        fields = [
+            "id", "estado", "created_at", "hora_salida", "pasajeros",
+            "form_nombres", "form_apellidos", "form_correo", "form_telefono",
+            "tenista_numero", "origen", "destino",
+        ]
+
+class ConductorListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Conductor
+        fields = ["id", "nombre", "apellido", "patente", "mail", "telefono", "activo", "created_at"]

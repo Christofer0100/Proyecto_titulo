@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Panel — Solicitudes y Conductores</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; margin: 24px; }
+    h1,h2 { margin: 8px 0; }
+    table { border-collapse: collapse; width: 100%; margin: 12px 0 32px; }
+    th, td { border: 1px solid #ddd; padding: 8px; font-size: 14px; }
+    th { background: #f7f7f7; text-align: left; }
+    .pill { border-radius: 999px; padding: 2px 8px; font-size: 12px; }
+    .ok { background: #e7f8ee; color: #157347; }
+    .warn { background: #fff4e5; color: #b76e00; }
+  </style>
+</head>
+<body>
+  <h1>Panel</h1>
+
+  <h2>Solicitudes</h2>
+  <table id="tbl-solicitudes">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Estado</th>
+        <th>Creada</th>
+        <th>Hora salida</th>
+        <th>Pasajeros</th>
+        <th>Nombre</th>
+        <th>Teléfono</th>
+        <th>Origen</th>
+        <th>Destino</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <h2>Conductores</h2>
+  <table id="tbl-conductores">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Patente</th>
+        <th>Mail</th>
+        <th>Teléfono</th>
+        <th>Activo</th>
+        <th>Creado</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const API_BASE = "https://massive-doe-set-fioricet.trycloudflare.com/api";
+
+    async function fetchJSON(url) {
+      const r = await fetch(url, { headers: { "Accept": "application/json" } });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json();
+    }
+
+    function fmtDate(s) {
+      if (!s) return "";
+      const d = new Date(s);
+      return d.toLocaleString();
+    }
+
+    function pillEstado(estado) {
+      const cls = (estado === "CONFIRMADA") ? "ok" :
+                  (estado === "EN_REVISION") ? "warn" : "";
+      return `<span class="pill ${cls}">${estado || ""}</span>`;
+    }
+
+    async function loadSolicitudes() {
+      // Si activas paginación en DRF, usa ?page=1&page_size=50
+      const data = await fetchJSON(`${API_BASE}/solicitudes/`);
+      const rows = (data.results || data).map(s => `
+        <tr>
+          <td>${s.id}</td>
+          <td>${pillEstado(s.estado)}</td>
+          <td>${fmtDate(s.created_at)}</td>
+          <td>${s.hora_salida || ""}</td>
+          <td>${s.pasajeros}</td>
+          <td>${s.form_nombres} ${s.form_apellidos}</td>
+          <td>${s.form_telefono}</td>
+          <td>${s.origen || ""}</td>
+          <td>${s.destino || ""}</td>
+        </tr>
+      `).join("");
+      document.querySelector("#tbl-solicitudes tbody").innerHTML = rows;
+    }
+
+    async function loadConductores() {
+      const data = await fetchJSON(`${API_BASE}/conductores/`);
+      const rows = (data.results || data).map(c => `
+        <tr>
+          <td>${c.id}</td>
+          <td>${c.nombre} ${c.apellido}</td>
+          <td>${c.patente || ""}</td>
+          <td>${c.mail}</td>
+          <td>${c.telefono || ""}</td>
+          <td>${c.activo ? "Sí" : "No"}</td>
+          <td>${fmtDate(c.created_at)}</td>
+        </tr>
+      `).join("");
+      document.querySelector("#tbl-conductores tbody").innerHTML = rows;
+    }
+
+    (async () => {
+      try {
+        await loadSolicitudes();
+        await loadConductores();
+      } catch (e) {
+        console.error(e);
+        alert("No se pudo cargar información del API.");
+      }
+    })();
+  </script>
+</body>
+</html>

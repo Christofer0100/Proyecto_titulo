@@ -12,6 +12,8 @@ from app.webhooks import (
    
 )
 from app.webhooks import tenista_por_numero
+from django.urls import path
+from app.views import SolicitudListAPI, ConductorListAPI
 
 router = DefaultRouter()
 router.register(r'coordinadores', CoordinadorViewSet, basename='coordinador')
@@ -28,5 +30,7 @@ urlpatterns = [
     path("solicitudes/<int:pk>/", solicitud_detail),
     path("api/tenistas/por-numero/", tenista_por_numero), 
     path("api/tenistas/por-numero/<path:numero>/", tenista_por_numero), 
+    path("solicitudes/", SolicitudListAPI.as_view()),
+    path("conductores/", ConductorListAPI.as_view()),
 ]
 
