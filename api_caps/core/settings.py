@@ -120,6 +120,7 @@ DATABASES = {
 
 
 
+
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
@@ -165,11 +166,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
-    "massive-doe-set-fioricet.trycloudflare.com",
+    "brought-favourite-met-development.trycloudflare.com",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://massive-doe-set-fioricet.trycloudflare.com",
+    "https://brought-favourite-met-development.trycloudflare.com",
 ]
 
 WEBHOOK_TOKEN = os.getenv("WEBHOOK_TOKEN", "whatsapp333")
