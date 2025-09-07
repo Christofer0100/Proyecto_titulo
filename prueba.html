@@ -118,5 +118,19 @@
       }
     })();
   </script>
+  <script>
+    const token = localStorage.getItem("coord_token");
+    if (!token) {
+    window.location.href = "inicio_sesion.html";
+    }
+
+    // Al llamar a la API, envía el token:
+    fetch("https://massive-doe-set-fioricet.trycloudflare.com/api/solicitudes/", {
+    headers: {
+        "Accept": "application/json",
+        "Authorization": "Bearer " + token
+    }
+    });
+    </script>
 </body>
 </html>

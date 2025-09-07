@@ -13,23 +13,24 @@
         <div class="curved-shape"></div>
         <div class="form-box Login">
             <h2>Iniciar Sesión</h2>
-            <form action="#">
-                <div class="input-box">
-                    <input type="email" required>
-                    <label for="">Correo Electronico</label>
-                    <i class='bx bxs-user'></i>
-                </div>
-                <div class="input-box">
-                    <input type="password" required>
-                    <label for="">Contraseña</label>
-                    <i class='bx bxs-lock-alt' ></i>
-                </div>
+        <form id="login-form">
+            <div class="input-box">
+                <input id="email" type="email" required />
+                <label for="email">Correo Electrónico</label>
+                <i class="bx bxs-user"></i>
+            </div>
 
-                <div class="input-box">
-                    <button class="btn" type="submit" href="coordinador.html">Iniciar</button>
-                </div>
+            <div class="input-box">
+                <input id="password" type="password" required />
+                <label for="password">Contraseña</label>
+                <i class="bx bxs-lock-alt"></i>
+            </div>
 
-            </form>
+            <div class="input-box">
+                <button class="btn" type="submit">Iniciar</button>
+            </div>
+        </form>
+
         </div>
 
         <div class="info-content Login">
@@ -39,6 +40,41 @@
 
     </div>
 
-    <script src="/js/inicio.js"></script>
+    <script>
+  const API_LOGIN = "https://massive-doe-set-fioricet.trycloudflare.com/api/auth/coordinador/login/";
+
+  document.getElementById("login-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    try {
+      const r = await fetch(API_LOGIN, {
+        method: "POST",
+        headers: {"Content-Type": "application/json", "Accept": "application/json"},
+        body: JSON.stringify({ email, password })
+      });
+      const data = await r.json();
+
+      if (!r.ok || !data.ok) {
+        alert(data.error || "Credenciales inválidas");
+        return;
+      }
+
+      // guarda token y datos mínimos
+      localStorage.setItem("coord_token", data.token);
+      localStorage.setItem("coord_nombre", data.coordinador.nombre);
+      localStorage.setItem("coord_correo", data.coordinador.correo);
+
+      // Redirige al panel de coordinador
+      window.location.href = "prueba.html";
+    } catch (err) {
+      console.error(err);
+      alert("No se pudo contactar al servidor.");
+    }
+  });
+</script>
+
 </body>
 </html>
+

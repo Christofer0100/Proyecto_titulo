@@ -15,6 +15,29 @@ from .serializers import (
     SolicitudReadNestedSerializer, SolicitudWriteSerializer,
     ReservaReadNestedSerializer, ReservaWriteSerializer
 )
+from app.models import Coordinador, CoordinadorToken, Solicitud, Tenista, Origen, Destino
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework import status
+from django.contrib.auth.hashers import check_password, make_password
+from django.utils import timezone
+from django.db import models
+import secrets
+from datetime import timedelta
+
+from .models import Coordinador
+# app/views.py
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework import status
+from django.utils import timezone
+from django.contrib.auth.hashers import check_password
+import logging
+
+from app.models import Coordinador, CoordinadorToken
+
 
 class BaseViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
@@ -88,3 +111,75 @@ class ConductorListAPI(generics.ListAPIView):
     queryset = Conductor.objects.all().order_by("-id")
     serializer_class = ConductorListSerializer
     permission_classes = [permissions.AllowAny]
+
+
+logger = logging.getLogger(__name__)
+
+def _emit_token(coord):
+    # elimina tokens viejos si quieres, o reusa el más reciente válido
+    CoordinadorToken.objects.filter(coordinador=coord, is_active=True, expires_at__lt=timezone.now()).update(is_active=False)
+
+    # crea token nuevo
+    from secrets import token_urlsafe
+    key = token_urlsafe(32)
+    t = CoordinadorToken.objects.create(
+        coordinador=coord,
+        key=key,
+        expires_at=timezone.now() + timezone.timedelta(days=1),
+        is_active=True,
+    )
+    return t
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def coordinador_login(request):
+    try:
+        email = (request.data.get('email') or '').strip().lower()
+        password = request.data.get('password') or ''
+
+        if not email or not password:
+            return Response(
+                {"ok": False, "error": "email y password son requeridos"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        coord = Coordinador.objects.filter(correo__iexact=email).first()
+        if not coord:
+            return Response(
+                {"ok": False, "error": "Coordinador no encontrado"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        if not coord.password_hash:
+            return Response(
+                {"ok": False, "error": "El coordinador no tiene contraseña definida"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        if not check_password(password, coord.password_hash):
+            return Response(
+                {"ok": False, "error": "Credenciales inválidas"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        token = _emit_token(coord)
+        return Response(
+            {
+                "ok": True,
+                "token": token.key,
+                "expires_at": token.expires_at.isoformat(),
+                "coordinador": {
+                    "id": coord.id,
+                    "correo": coord.correo,
+                    "nombre": getattr(coord, "nombre", None),
+                },
+            },
+            status=status.HTTP_200_OK,
+        )
+
+    except Exception as e:
+        logger.exception("Error en login de coordinador")
+        return Response(
+            {"ok": False, "error": "Error interno"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )

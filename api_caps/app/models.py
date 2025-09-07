@@ -24,16 +24,15 @@ class Coordinador(models.Model):
     id         = models.BigAutoField(primary_key=True)
     nombre     = models.TextField()
     correo     = models.TextField(unique=True)
+    password_hash = models.CharField(max_length=128, default="")  # <— NUEVO
     created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
         managed  = True
         db_table = "coordinador"
-        ordering = ("-id",)
 
     def __str__(self):
         return f"{self.nombre} <{self.correo}>"
-
 
 class Conductor(models.Model):
     id         = models.BigAutoField(primary_key=True)
@@ -185,3 +184,21 @@ class Reserva(models.Model):
 
     def __str__(self):
         return f"Reserva #{self.id} - {self.estado}"
+
+
+class CoordinadorToken(models.Model):
+    coordinador = models.ForeignKey(
+        Coordinador,
+        on_delete=models.CASCADE,
+        related_name="tokens",
+        db_column="coordinador_id",
+    )
+    key = models.CharField(max_length=64, unique=True, db_index=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    expires_at = models.DateTimeField()
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        managed = True               # IMPORTANTE: que sea True
+        db_table = "coordinador_token"
+
