@@ -1,0 +1,30 @@
+#instalaciones previas: 
+
+#1. Instalar Python.
+#2. Instalar Nodejs
+#3. Instalar Postgresql   tomaXx282@
+#4. Instalar entorno virtual.   
+#5. pip install django djangorestframework psycopg2-binary python-dotenv djangorestframework-simplejwt
+#6. pip install django-cors-headers
+
+#python -m venv .venv
+
+
+#.venv/Scripts/activate
+
+#API
+
+#como correr la api paso a paso:
+
+#1. cd api_caps
+#2. python -m venv .venv
+#3. .venv/Scripts/activate             /////           & .\.venv\Scripts\Activate.ps1
+#4. pip install django
+#5. pip install django djangorestframework psycopg2-binary python-dotenv djangorestframework-simplejwt
+#6. pip install django-cors-headers
+
+
+
+
+
+#HTML
