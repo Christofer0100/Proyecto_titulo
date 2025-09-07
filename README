@@ -18,10 +18,11 @@
 
 #1. cd api_caps
 #2. python -m venv .venv
-#3. .venv/Scripts/activate             /////           & .\.venv\Scripts\Activate.ps1
-#4. pip install django
-#5. pip install django djangorestframework psycopg2-binary python-dotenv djangorestframework-simplejwt
-#6. pip install django-cors-headers
+#3.   Set-ExecutionPolicy -Scope Process Bypass
+#4. .venv/Scripts/activate             /////           & .\.venv\Scripts\Activate.ps1
+#5. pip install django
+#6. pip install django djangorestframework psycopg2-binary python-dotenv djangorestframework-simplejwt
+#7. pip install django-cors-headers
 
 
 
