@@ -5,18 +5,29 @@ from .models import (
     Coordinador, Conductor, Tenista, Origen, Destino,
     Solicitud, Reserva
 )
+from app.models import Conductor, Solicitud, Reserva
+
 
 class CoordinadorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Coordinador
         fields = "__all__"
 
+class SolicitudSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Solicitud
+        fields = "__all__"
+
+class ReservaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Reserva
+        fields = "__all__"
+
 
 class ConductorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Conductor
-        fields = "__all__"
-
+        fields = ["id", "nombre", "apellido", "telefono", "mail", "activo"]
 
 class TenistaSerializer(serializers.ModelSerializer):
     class Meta:

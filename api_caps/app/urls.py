@@ -16,6 +16,12 @@ from django.urls import path
 from app.views import SolicitudListAPI, ConductorListAPI
 from django.urls import path
 from app.views import coordinador_login
+from django.urls import path
+from app.views import (
+    ConductoresListView,
+    asignar_conductor_a_solicitud,
+)
+
 
 router = DefaultRouter()
 router.register(r'coordinadores', CoordinadorViewSet, basename='coordinador')
@@ -35,5 +41,7 @@ urlpatterns = [
     path("solicitudes/", SolicitudListAPI.as_view()),
     path("conductores/", ConductorListAPI.as_view()),
     path("auth/coordinador/login/", coordinador_login),
+    path("solicitudes/<int:pk>/asignar/", asignar_conductor_a_solicitud, name="solicitud-asignar"),
+    path("conductores/", ConductoresListView.as_view(), name="conductores-list"),
 ]
 
