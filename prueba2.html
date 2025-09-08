@@ -3,188 +3,187 @@
 <head>
   <meta charset="utf-8" />
   <title>Solicitudes - Asignación de Conductor</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    /* =========================
-       Diseño con variables
-       ========================= */
-    :root{
-      color-scheme: light dark;
-      --bg: #f7f8fb;
-      --card: #ffffff;
-      --text: #1f2937;
-      --muted: #6b7280;
-      --border: #e5e7eb;
-      --border-strong:#d1d5db;
-      --primary: #2563eb;
-      --primary-600:#1d4ed8;
-      --primary-50:#eef2ff;
-      --success:#10b981;
-      --warning:#f59e0b;
-      --danger:#ef4444;
-      --row: #ffffff;
-      --row-alt: #f9fafb;
-      --row-hover:#f3f4f6;
-      --badge-bg:#f3f4f6;
-    }
-    @media (prefers-color-scheme: dark){
-      :root{
-        --bg:#0b0d10;
-        --card:#12161c;
-        --text:#e5e7eb;
-        --muted:#9ca3af;
-        --border:#1f2937;
-        --border-strong:#374151;
-        --primary:#60a5fa;
-        --primary-600:#3b82f6;
-        --primary-50:#0b1220;
-        --row:#151a21;
-        --row-alt:#11161d;
-        --row-hover:#1a212a;
-        --badge-bg:#17202a;
-      }
-    }
-
-    html,body{height:100%}
-    body{
-      margin:0; padding:24px;
-      background:var(--bg); color:var(--text);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
-    }
-
-    .container{
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    h1{
-      margin:0 0 16px;
-      font-size: clamp(1.1rem, 1vw + 1rem, 1.6rem);
-      letter-spacing:.2px;
-    }
-
-    .card{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:16px;
-      box-shadow: 0 8px 30px rgba(0,0,0,.06);
-      overflow:hidden;
-    }
-
-    .toolbar{
-      display:flex; align-items:center; gap:12px;
-      padding: 16px; border-bottom:1px solid var(--border);
-      background: linear-gradient(180deg, color-mix(in srgb, var(--card), var(--border) 6%), var(--card));
-    }
-    .toolbar input{
-      padding:10px 12px; border-radius:10px; border:1px solid var(--border-strong);
-      background: transparent; color:var(--text); outline: none; min-width:260px;
-      transition: border-color .2s, box-shadow .2s;
-    }
-    .toolbar input:focus{
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary), transparent 80%);
-    }
-    .muted{ color:var(--muted); font-size:.92rem; }
-
-    /* ===== Tabla ===== */
-    .table-wrap{ overflow:auto; }
-    table{ width:100%; border-collapse:separate; border-spacing:0; min-width:900px; }
-    thead th{
-      position: sticky; top:0; z-index: 2;
-      background: linear-gradient(180deg, color-mix(in srgb, var(--card), #fff 8%), var(--card));
-      color: var(--muted);
-      font-weight: 600;
-      letter-spacing:.3px;
-      border-bottom:1px solid var(--border-strong);
-      padding:12px 14px;
-      text-align:left;
-      backdrop-filter:saturate(180%) blur(4px);
-    }
-    tbody td{
-      padding:14px;
-      border-bottom:1px solid var(--border);
-      background:var(--row);
-    }
-    tbody tr:nth-child(even) td{ background:var(--row-alt); }
-    tbody tr:hover td{ background:var(--row-hover); }
-
-    /* Ancho mínimo para última columna */
-    th:last-child, td:last-child{ width: 120px; }
-
-    .pill{
-      display:inline-flex; align-items:center; gap:.45rem;
-      padding:4px 10px; border-radius:999px; font-size:.8rem;
-      background:var(--primary-50); color:var(--primary-600);
-      border:1px solid color-mix(in srgb, var(--primary-600), transparent 70%);
-    }
-
-    .badge{
-      padding:4px 10px; border-radius:999px; font-size:.78rem;
-      border:1px solid var(--border-strong); background:var(--badge-bg);
-    }
-    .badge.NUEVA{ background: color-mix(in srgb, var(--warning), transparent 82%); border-color: color-mix(in srgb, var(--warning), transparent 50%); color: color-mix(in srgb, var(--warning), #000 20%); }
-    .badge.ASIGNADA{ background: color-mix(in srgb, var(--success), transparent 85%); border-color: color-mix(in srgb, var(--success), transparent 55%); color: color-mix(in srgb, var(--success), #000 10%); }
-
-    .btn{
-      --_bg: transparent;
-      --_bc: var(--border-strong);
-      --_fg: var(--text);
-      padding:10px 12px; border-radius:10px; border:1px solid var(--_bc);
-      background: var(--_bg); color: var(--_fg); cursor:pointer;
-      transition: transform .04s, background-color .15s, border-color .15s, box-shadow .15s;
-    }
-    .btn:hover{ transform: translateY(-1px); }
-    .btn.primary{ --_bg: var(--primary); --_bc: var(--primary); --_fg: #fff; }
-    .btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
-
-    /* ===== Modal nativo estilizado ===== */
-    dialog::backdrop{ background: rgba(0,0,0,.45); backdrop-filter: blur(2px); }
-    dialog{ border:none; padding:0; border-radius:16px; width:560px; max-width:96vw; background:var(--card); color:var(--text); }
-    .modal-header{ padding:14px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
-    .modal-body{ padding:16px; display:grid; gap:12px; }
-    .modal-footer{ padding:12px 16px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:8px; }
-    select, input[type="datetime-local"]{
-      width:100%; padding:10px 12px; border:1px solid var(--border-strong); border-radius:10px; background:transparent; color:var(--text);
-      outline:none; transition:border-color .2s, box-shadow .2s;
-    }
-    select:focus, input[type="datetime-local"]:focus{
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary), transparent 80%);
-    }
-  </style>
+  <link rel="stylesheet" href="css/cdr.css">
 </head>
+
+
 <body>
+
   <div class="container">
-    <h1>Solicitudes</h1>
 
-    <div class="card">
-      <div class="toolbar">
-        <input id="q" type="search" placeholder="Buscar por nombre, teléfono, origen o destino…" />
-        <span id="status" class="muted">—</span>
-      </div>
+    <aside>
+            <div class="toggle">
+                <div class="logo">
+                    <img src="imagenes/3.jpg">
+                    <h2><span class="primary">ATP</span></h2>
+                </div>
+                <div class="close" id="close-btn">
+                    <span class="material-icons-sharp">
+                        close
+                    </span>
+                </div>
+            </div>
 
-      <div class="table-wrap">
-        <table aria-label="Tabla de solicitudes">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Tenista</th>
-              <th>Teléfono</th>
-              <th>Hora salida</th>
-              <th>Origen</th>
-              <th>Destino</th>
-              <th>Estado</th>
-              <th>Asignar</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-solicitudes">
-            <!-- JS -->
-          </tbody>
-        </table>
-      </div>
-    </div>
+            <div class="sidebar">
+                <a href="#">
+                    <span class="material-icons-sharp">
+                        dashboard
+                    </span>
+                    <h3>Dashboard</h3>
+                </a>
+                <a href="#">
+                    <span class="material-icons-sharp">
+                        person_outline
+                    </span>
+                    <h3>Tenista</h3>
+                </a>
+                <a href="#">
+                    <span class="material-icons-sharp">
+                        person_outline
+                    </span>
+                    <h3>Conductores</h3>
+                </a>
+                <a href="#" class="active">
+                    <span class="material-icons-sharp">
+                        insights
+                    </span>
+                    <h3>Solicitudes</h3>
+                </a>
+                <a href="#">
+                    <span class="material-icons-sharp">
+                        receipt_long
+                    </span>
+                    <h3>Historial</h3>
+                </a>
+                <a href="#">
+                    <span class="material-icons-sharp">
+                        logout
+                    </span>
+                    <h3>Cerrar Sesión</h3>
+                </a>
+            </div>
+    </aside>
+
+      <main>
+            <h1>Solicitudes</h1>
+
+            <div class="analyse">
+                <div class="sales">
+                    <div class="status">
+                        <div class="info">
+                            <h3>Kilometros recorridos</h3>
+                            <h1>625 KM</h1>
+                        </div>
+                        <div class="progresss">
+                            <svg>
+                                <circle cx="38" cy="38" r="36"></circle>
+                            </svg>
+                            <div class="percentage">
+                                <p>+64%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="visits">
+                    <div class="status">
+                        <div class="info">
+                            <h3>Viajes Coordinados</h3>
+                            <h1>14</h1>
+                        </div>
+                        <div class="progresss">
+                            <svg>
+                                <circle cx="38" cy="38" r="36"></circle>
+                            </svg>
+                            <div class="percentage">
+                                <p>68%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="searches">
+                    <div class="status">
+                        <div class="info">
+                            <h3>Viajes Totales</h3>
+                            <h1>320</h1>
+                        </div>
+                        <div class="progresss">
+                            <svg>
+                                <circle cx="38" cy="38" r="36"></circle>
+                            </svg>
+                            <div class="percentage">
+                                <p>+21%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            <div class="recent-orders">
+                <div class="card">
+                  <div class="toolbar">
+                    <input id="q" type="search" placeholder="Buscar por nombre, teléfono, origen o destino…" />
+                    <span id="status" class="buscar">—</span>
+                  </div>
+
+                    <div class="table-wrap">
+                      <table aria-label="Tabla de solicitudes">
+                        <thead>
+                          <tr>
+                            <th>ID</th>
+                            <th>Tenista</th>
+                            <th>Teléfono</th>
+                            <th>Hora salida</th>
+                            <th>Origen</th>
+                            <th>Destino</th>
+                            <th>Estado</th>
+                          </tr>
+                        </thead>
+                        <tbody id="tbody-solicitudes">
+                          <!-- JS -->
+                        </tbody>
+                      </table>
+                    </div>
+                </div>
+            </div>
+          
+
+        </main>
+
+        <div class="right-section">
+            <div class="nav">
+                <button id="menu-btn">
+                    <span class="material-icons-sharp">
+                        menu
+                    </span>
+                </button>
+                <div class="dark-mode">
+                    <span class="material-icons-sharp active">
+                        light_mode
+                    </span>
+                    <span class="material-icons-sharp">
+                        dark_mode
+                    </span>
+                </div>
+
+                <div class="profile">
+                    <div class="info">
+                        <p>Hola, <b>Helena</b></p>
+                        <small class="text-muted">Coordinador</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+
   </div>
+
+
+ 
 
   <!-- Modal asignación -->
   <dialog id="dlg-asignacion" aria-labelledby="dlg-title">
@@ -206,14 +205,17 @@
       </div>
       <div class="modal-footer">
         <button class="btn" value="cancel">Cancelar</button>
-        <button id="btn-confirm" class="btn primary" value="confirm">Asignar</button>
+        <button id="btn-confirm" class="btn secondaryu" value="confirm">Asignar</button>
       </div>
     </form>
   </dialog>
 
+
+
+
   <script>
     /* ============== CONFIG ============== */
-    const API_BASE = 'https://brought-favourite-met-development.trycloudflare.com/api';  // <- cambia esto si usas túnel
+    const API_BASE = 'https://seeks-y-objective-noticed.trycloudflare.com/api';  // <- cambia esto si usas túnel
     const TOKEN = '';                               // <- o toma de localStorage si corresponde
 
     /* ============== HELPERS ============== */
@@ -276,7 +278,7 @@
         </tr>
         `;
     }).join('');
-}
+    }
 
     function filtrar(){
       const term = $q.value.trim().toLowerCase();
@@ -365,5 +367,6 @@
       await cargarSolicitudes();
     })();
   </script>
+  <script src="/js/coordinador.js"></script>
 </body>
 </html>
