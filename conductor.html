@@ -1,11 +1,189 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+  <meta charset="utf-8" />
+  <title>Solicitudes - Asignación de Conductor</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="css/conductor.css">
 </head>
+
+
 <body>
-    <h1>Conductores</h1>
+
+  <div class="container">
+
+    <aside>
+            <div class="toggle">
+                <div class="logo">
+                    <img src="imagenes/3.jpg">
+                    <h2><span class="primary">ATP</span></h2>
+                </div>
+                <div class="close" id="close-btn">
+                    <span class="material-icons-sharp">
+                        close
+                    </span>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <a href="#">
+                    <span class="material-icons-sharp">
+                        dashboard
+                    </span>
+                    <h3>Dashboard</h3>
+                </a>
+                <a href="#">
+                    <span class="material-icons-sharp">
+                        person_outline
+                    </span>
+                    <h3>Tenista</h3>
+                </a>
+                <a href="/conductor.html" class="active">
+                    <span class="material-icons-sharp">
+                        person_outline
+                    </span>
+                    <h3>Conductores</h3>
+                </a>
+                <a href="/prueba2.html" class="">
+                    <span class="material-icons-sharp">
+                        insights
+                    </span>
+                    <h3>Solicitudes</h3>
+                </a>
+                <a href="#">
+                    <span class="material-icons-sharp">
+                        receipt_long
+                    </span>
+                    <h3>Historial</h3>
+                </a>
+                <a href="#">
+                    <span class="material-icons-sharp">
+                        logout
+                    </span>
+                    <h3>Cerrar Sesión</h3>
+                </a>
+            </div>
+    </aside>
+
+        <main>
+            <h1>Conductores</h1>
+            <div class="recent-orders">
+                <div class="card">
+                    <div class="table-wrap">
+                      <table id="tbl-conductores">
+                            <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Patente</th>
+                                <th>Mail</th>
+                                <th>Teléfono</th>
+                                <th>Activo</th>
+                                <th>Creado</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+          
+
+        </main>
+
+        <div class="right-section">
+            <div class="nav">
+                <button id="menu-btn">
+                    <span class="material-icons-sharp">
+                        menu
+                    </span>
+                </button>
+                <div class="dark-mode">
+                    <span class="material-icons-sharp active">
+                        light_mode
+                    </span>
+                    <span class="material-icons-sharp">
+                        dark_mode
+                    </span>
+                </div>
+
+                <div class="profile">
+                    <div class="info">
+                        <p>Hola, <b>Helena</b></p>
+                        <small class="text-muted">Coordinador</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script>
+    const API_BASE = "https://shown-nine-modify-puzzles.trycloudflare.com/api";
+
+    async function fetchJSON(url) {
+      const r = await fetch(url, { headers: { "Accept": "application/json" } });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json();
+    }
+
+    function fmtDate(s) {
+      if (!s) return "";
+      const d = new Date(s);
+      return d.toLocaleString();
+    }
+
+    function pillEstado(estado) {
+      const cls = (estado === "CONFIRMADA") ? "ok" :
+                  (estado === "EN_REVISION") ? "warn" : "";
+      return `<span class="pill ${cls}">${estado || ""}</span>`;
+    }
+
+    async function loadConductores() {
+      const data = await fetchJSON(`${API_BASE}/conductores/`);
+      const rows = (data.results || data).map(c => `
+        <tr>
+          <td>${c.nombre} ${c.apellido}</td>
+          <td>${c.patente || ""}</td>
+          <td>${c.mail}</td>
+          <td>${c.telefono || ""}</td>
+          <td>${c.activo ? "Sí" : "No"}</td>
+          <td>${fmtDate(c.created_at)}</td>
+        </tr>
+      `).join("");
+      document.querySelector("#tbl-conductores tbody").innerHTML = rows;
+    }
+
+    (async () => {
+      try {
+        await loadConductores();
+      } catch (e) {
+        console.error(e);
+        alert("No se pudo cargar información del API.");
+      }
+    })();
+  </script>
+  <script>
+    const token = localStorage.getItem("coord_token");
+    if (!token) {
+    window.location.href = "inicio_sesion.html";
+    }
+
+    // Al llamar a la API, envía el token:
+    fetch("https://shown-nine-modify-puzzles.trycloudflare.com/api/solicitudes/", {
+    headers: {
+        "Accept": "application/json",
+        "Authorization": "Bearer " + token
+    }
+    });
+    </script>
+
+
+
+
+
+
+  <script src="/js/coordinador.js"></script>
 </body>
 </html>

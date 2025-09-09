@@ -39,7 +39,7 @@
                     </span>
                     <h3>Tenista</h3>
                 </a>
-                <a href="#">
+                <a href="/conductor.html">
                     <span class="material-icons-sharp">
                         person_outline
                     </span>
@@ -57,7 +57,7 @@
                     </span>
                     <h3>Historial</h3>
                 </a>
-                <a href="#">
+                <a href="/inicio_sesion.html">
                     <span class="material-icons-sharp">
                         logout
                     </span>
@@ -125,7 +125,7 @@
             <div class="recent-orders">
                 <div class="card">
                   <div class="toolbar">
-                    <input id="q" type="search" placeholder="Buscar por nombre, teléfono, origen o destino…" />
+                    <input id="q" type="search" placeholder="Buscar por nombre o teléfono" />
                     <span id="status" class="buscar">—</span>
                   </div>
 
@@ -171,7 +171,7 @@
 
                 <div class="profile">
                     <div class="info">
-                        <p>Hola, <b>Helena</b></p>
+                        <p class="h">Hola, <b>Helena</b></p>
                         <small class="text-muted">Coordinador</small>
                     </div>
                 </div>
@@ -190,7 +190,7 @@
     <form method="dialog">
       <div class="modal-header">
         <strong id="dlg-title">Asignar conductor</strong>
-        <button class="btn" value="cancel" aria-label="Cerrar">✕</button>
+        <button class="btn-bla" value="cancel" aria-label="Cerrar">✕</button>
       </div>
       <div class="modal-body">
         <div><span class="muted">Solicitud:</span> <span id="dlg-sol-info" class="pill"></span></div>
@@ -204,8 +204,8 @@
         </label>
       </div>
       <div class="modal-footer">
-        <button class="btn" value="cancel">Cancelar</button>
-        <button id="btn-confirm" class="btn secondaryu" value="confirm">Asignar</button>
+        <button class="btn-bla" value="cancel">Cancelar</button>
+        <button id="btn-confirm" class="btn secondary" value="confirm">Asignar</button>
       </div>
     </form>
   </dialog>
@@ -215,7 +215,7 @@
 
   <script>
     /* ============== CONFIG ============== */
-    const API_BASE = 'https://seeks-y-objective-noticed.trycloudflare.com/api';  // <- cambia esto si usas túnel
+    const API_BASE = 'https://shown-nine-modify-puzzles.trycloudflare.com/api';  // <- cambia esto si usas túnel
     const TOKEN = '';                               // <- o toma de localStorage si corresponde
 
     /* ============== HELPERS ============== */

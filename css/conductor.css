@@ -29,7 +29,6 @@
     --box-shadow: 0 2rem 3rem var(--color-light);
     --muted: #ffffff;
     --buscar: #000000;
-    --border-strong:#677483;
 }
 
 .dark-mode-variables{
@@ -56,88 +55,50 @@
 }
 
 .toolbar{
-    display:flex; 
-    align-items:center; 
-    gap:12px;
-    padding: 16px; 
-    border-bottom:1px solid var(--border);
+    display:flex; align-items:center; gap:12px;
+    padding: 16px; border-bottom:1px solid var(--border);
+    background-color: var(--color-fondo);
     color: #000;
     border-radius: var(--card-border-radius);
 }
-
 .toolbar input{
-    padding:10px 12px; 
-    border-radius:10px; 
-    border:1px solid var(--border-strong);
-    background: transparent; 
-    color:var(--text); outline: none; 
-    min-width:260px;
-    transition: border-color .2s, box-shadow .2s;
+      padding:10px 12px; border-radius:10px; border:1px solid var(--border-strong);
+      background: transparent; color:var(--text); outline: none; min-width:260px;
+      transition: border-color .2s, box-shadow .2s;
 }
 .toolbar input:focus{
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary));
-}
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary));
+ }
+.muted{ color:var(--muted); font-size:.92rem; }
+.buscar{ color: var(--buscar); font-size:.92rem; }
 
-.muted{ 
-    color:var(--muted); 
-    font-size:.92rem; 
-}
-
-.buscar{ 
-    color: var(--buscar); 
-    font-size:.92rem;
-}
-
-th:last-child, td:last-child{ 
-    width: 120px; 
-}
+th:last-child, td:last-child{ width: 120px; }
 
 .pill{
-    display:inline-flex; 
-    align-items:center; 
-    gap:.45rem;
-    padding:4px 10px; 
-    border-radius:999px; 
-    font-size:.8rem;
-    background-color: #a2be3c;
-    border:1px solid color-mix(in srgb, var(--primary-600));
-    color: #000;
+      display:inline-flex; align-items:center; gap:.45rem;
+      padding:4px 10px; border-radius:999px; font-size:.8rem;
+      background-color: #a2be3c;
+      border:1px solid color-mix(in srgb, var(--primary-600));
+      color: #000;
 }
 
 .badge{
-    padding:4px 10px; 
-    border-radius:999px; 
-    font-size:.78rem;
-    border:1px solid var(--border-strong); 
-    background:var(--badge-bg);
+      padding:4px 10px; border-radius:999px; font-size:.78rem;
+      border:1px solid var(--border-strong); background:var(--badge-bg);
 }
-
-.badge.NUEVA{ 
-    background:#0f59c9; 
-    border-color: color-mix(in srgb, var(--warning)); 
-    color:#fff; 
-}
-
-.badge.ASIGNADA{ 
-    background:#1B9C85; 
-    border-color: color-mix(in srgb, var(--success)); 
-    color:#fff; ; 
-}
+.badge.NUEVA{ background: color-mix(in srgb, var(--warning)); border-color: color-mix(in srgb, var(--warning)); color: color-mix(in srgb, var(--warning), #000 20%); }
+.badge.ASIGNADA{ background: color-mix(in srgb, var(--success)); border-color: color-mix(in srgb, var(--success)); color: color-mix(in srgb, var(--success), #000 10%); }
 
 .btn{
-    --_bg: transparent;
-    --_bc:var(--buscar);
-    --_fg: var(--text);
-    padding:6px 12px; 
-    border-radius:10px; 
-    border:1px;
-    background:#a2be3c; 
-    cursor:pointer;
-    transition: transform .04s, background-color .15s, border-color .15s, box-shadow .15s;
+      --_bg: transparent;
+      --_bc: var(--border-strong);
+      --_fg: var(--text);
+      padding:10px 12px; border-radius:10px; border:1px;
+      background: var(--_bg); color: var(--_fg); cursor:pointer;
+      transition: transform .04s, background-color .15s, border-color .15s, box-shadow .15s;
 
 }
-
 .btn-bla{
     --_bg: transparent;
     padding:10px 12px; border-radius:10px; border:1px;
@@ -145,74 +106,27 @@ th:last-child, td:last-child{
     transition: transform .04s, background-color .15s, border-color .15s, box-shadow .15s;
 
 }
+.btn:hover{ transform: translateY(-1px); }
+.btn.secondary{ --_bg: #a2be3c; --_bc: var(--primary); --_fg: #fff; }
+.btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
 
-.btn:hover{ 
-    transform: translateY(-1px); 
-}
-
-.btn.secondary{ 
-    --_bg: #a2be3c; 
-    --_bc: var(--primary); 
-    --_fg: #fff; 
-}
-
-.btn:disabled{ 
-    opacity:.55; 
-    cursor:not-allowed; 
-    transform:none; 
-}
-
-dialog::backdrop{ 
-    background: rgba(0,0,0,.45); 
-    backdrop-filter: 
-    blur(2px); 
-}
-
-dialog{ 
-    border:none; 
-    padding:0; 
-    border-radius:16px; 
-    width:560px; max-width:96vw; 
-    background:var(--card); 
-    color: #fff; 
-}
-
-.modal-header{ 
-    padding:14px 16px; 
-    border-bottom:1px solid var(--border); 
-    display:flex; 
-    align-items:center; 
-    justify-content:space-between; 
-    background-color: #0f59c9;
-}
-
-.modal-body{ 
-    padding:16px; 
-    display:grid; 
-    gap:12px; 
-    background-color: #0f59c9;
-}
-
-.modal-footer{ 
-    padding:12px 16px; 
-    border-top:1px solid var(--border); 
-    display:flex; justify-content:flex-end; 
-    gap:8px; background-color: #0f59c9; 
-}
-
+    /* ===== Modal nativo estilizado ===== */
+dialog::backdrop{ background: rgba(0,0,0,.45); backdrop-filter: blur(2px); }
+dialog{ border:none; padding:0; border-radius:16px; width:560px; max-width:96vw; background:var(--card); color: #fff; }
+.modal-header{ padding:14px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; background-color: #0f59c9;}
+.modal-body{ padding:16px; display:grid; gap:12px; background-color: #0f59c9;}
+.modal-footer{ padding:12px 16px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:8px; background-color: #0f59c9; }
 select, input[type="datetime-local"]{
-    width:100%; 
-    padding:10px 1px; 
-    border:1px solid var(--border-strong); 
-    border-radius:10px;
-    outline:none; 
-    transition:border-color .2s, box-shadow .2s;
+      width:100%; padding:10px 1px; border:1px solid var(--border-strong); border-radius:10px;
+      outline:none; transition:border-color .2s, box-shadow .2s;
+}
+select:focus, input[type="datetime-local"]:focus{
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary));
 }
 
-select:focus, input[type="datetime-local"]:focus{
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary));
-}
+
+
 
 html{
     font-size: 14px;
@@ -259,6 +173,7 @@ small{
 }
 
 p{
+    margin-top: -0.5rem;
     color: var(--color-dark-variant);
 }
 
@@ -527,7 +442,7 @@ main .recent-orders h2{
 
 main .recent-orders table{
     background-color: var(--color-white);
-    width: 100%;
+    width: 114%;
     padding: var(--card-padding);
     text-align: center;
     box-shadow: var(--box-shadow);
@@ -594,10 +509,6 @@ main .recent-orders a{
     background-color: var(--color-primary);
     color: white;
     border-radius: var(--border-radius-1);
-}
-
-.right-section .profile .info{
-    margin-top: -1.4rem;
 }
 
 
