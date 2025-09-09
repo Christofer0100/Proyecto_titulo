@@ -163,16 +163,6 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-ALLOWED_HOSTS = [
-    "127.0.0.1",
-    "localhost",
-    "shown-nine-modify-puzzles.trycloudflare.com",
-]
-
-CSRF_TRUSTED_ORIGINS = [
-    "https://shown-nine-modify-puzzles.trycloudflare.com",
-]
-
 WEBHOOK_TOKEN = os.getenv("WEBHOOK_TOKEN", "whatsapp333")
 
 
