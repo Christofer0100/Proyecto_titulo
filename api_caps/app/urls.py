@@ -21,7 +21,9 @@ from app.views import (
     ConductoresListView,
     asignar_conductor_a_solicitud,
 )
-
+from .views import ReservaViewSet
+from .views import ReservaListView
+from .views import TenistaListView
 
 router = DefaultRouter()
 router.register(r'coordinadores', CoordinadorViewSet, basename='coordinador')
@@ -31,6 +33,7 @@ router.register(r'origenes', OrigenViewSet, basename='origen')
 router.register(r'destinos', DestinoViewSet, basename='destino')
 router.register(r'solicitudes', SolicitudViewSet, basename='solicitud')
 router.register(r'reservas',   ReservaViewSet,   basename='reserva')
+
 
 urlpatterns = [
     path('api/', include(router.urls)),
@@ -43,5 +46,7 @@ urlpatterns = [
     path("auth/coordinador/login/", coordinador_login),
     path("solicitudes/<int:pk>/asignar/", asignar_conductor_a_solicitud, name="solicitud-asignar"),
     path("conductores/", ConductoresListView.as_view(), name="conductores-list"),
+   path("reservas/", ReservaListView.as_view(), name="reserva-list"),
+   path("tenistas/", TenistaListView.as_view(), name="tenista-list"),
 ]
 

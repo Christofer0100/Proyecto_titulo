@@ -28,15 +28,11 @@ SECRET_KEY = 'django-insecure-j*cjca)w7wha-i83*&t3iv174pk1#l=3xg6##7p$)29%(tcp2@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    ".trycloudflare.com",  # permite cualquier subdominio de trycloudflare
-]
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://*.trycloudflare.com",
-]
+ALLOWED_HOSTS = ["*"]
+
+
+
 
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

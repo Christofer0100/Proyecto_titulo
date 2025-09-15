@@ -285,3 +285,13 @@ def asignar_conductor_a_solicitud(request, pk: int):
         "solicitud_id": sol.id,
         "reserva": ReservaSerializer(reserva).data
     }, status=200)
+
+
+class ReservaListView(generics.ListAPIView):
+    queryset = Reserva.objects.all().order_by('-fecha_hora_agendada')
+    serializer_class = ReservaSerializer
+
+
+class TenistaListView(generics.ListAPIView):
+    queryset = Tenista.objects.all().order_by("id")
+    serializer_class = TenistaSerializer

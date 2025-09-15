@@ -5,7 +5,7 @@
   <title>Solicitudes - Asignación de Conductor</title>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="css/conductor.css">
+  <link rel="stylesheet" href="css/tenista.css">
 </head>
 
 
@@ -33,13 +33,13 @@
                     </span>
                     <h3>Dashboard</h3>
                 </a>
-                <a href="#">
+                <a href="/tenistas.html"  class="active">
                     <span class="material-icons-sharp">
                         person_outline
                     </span>
                     <h3>Tenista</h3>
                 </a>
-                <a href="/conductor.html" class="active">
+                <a href="/conductor.html" >
                     <span class="material-icons-sharp">
                         person_outline
                     </span>
@@ -51,11 +51,11 @@
                     </span>
                     <h3>Solicitudes</h3>
                 </a>
-                <a href="#">
+                <a href="/reservas.html" >
                     <span class="material-icons-sharp">
                         receipt_long
                     </span>
-                    <h3>Historial</h3>
+                    <h3>Reservas</h3>
                 </a>
                 <a href="#">
                     <span class="material-icons-sharp">
@@ -67,22 +67,24 @@
     </aside>
 
         <main>
-            <h1>Conductores</h1>
+            <h1>Reservas</h1>
             <div class="recent-orders">
                 <div class="card">
                     <div class="table-wrap">
-                      <table id="tbl-conductores">
+                      <table id="tbl-tenistas">
                             <thead>
                             <tr>
+                                <th>Id</th>
                                 <th>Nombre</th>
-                                <th>Patente</th>
-                                <th>Mail</th>
-                                <th>Teléfono</th>
-                                <th>Activo</th>
-                                <th>Creado</th>
+                                <th>Apellido</th>
+                                <th>Correo</th>
+                                <th>Numero</th>
+                                
                             </tr>
                             </thead>
-                            <tbody></tbody>
+                            <tbody id="tbody-tenistas">
+                            <tr><td colspan="6" style="text-align:center;">Cargando...</td></tr>
+                             </tbody>
                         </table>
                     </div>
                 </div>
@@ -117,73 +119,52 @@
         </div>
     </div>
 
+     <script>
+    const API_BASE = "https://rotten-queens-wish.loca.lt/api";  // cambia a tu endpoint real
+    const TOKEN = localStorage.getItem("coord_token") || "";
 
-
-    <script>
-    const API_BASE = "https://cute-parrots-itch.loca.lt/api";
-
-    async function fetchJSON(url) {
-      const r = await fetch(url, { headers: { "Accept": "application/json" } });
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    async function fetchJSON(url, opts = {}) {
+      const headers = {
+        "Accept": "application/json",
+        ...(opts.method ? { "Content-Type": "application/json" } : {}),
+        ...(TOKEN ? { "Authorization": "Bearer " + TOKEN } : {})
+      };
+      const r = await fetch(url, { ...opts, headers });
+      if (!r.ok) throw new Error("Error HTTP " + r.status);
       return r.json();
     }
 
-    function fmtDate(s) {
-      if (!s) return "";
-      const d = new Date(s);
-      return d.toLocaleString();
-    }
-
-    function pillEstado(estado) {
-      const cls = (estado === "CONFIRMADA") ? "ok" :
-                  (estado === "EN_REVISION") ? "warn" : "";
-      return `<span class="pill ${cls}">${estado || ""}</span>`;
-    }
-
-    async function loadConductores() {
-      const data = await fetchJSON(`${API_BASE}/conductores/`);
-      const rows = (data.results || data).map(c => `
-        <tr>
-          <td>${c.nombre} ${c.apellido}</td>
-          <td>${c.patente || ""}</td>
-          <td>${c.mail}</td>
-          <td>${c.telefono || ""}</td>
-          <td>${c.activo ? "Sí" : "No"}</td>
-          <td>${fmtDate(c.created_at)}</td>
-        </tr>
-      `).join("");
-      document.querySelector("#tbl-conductores tbody").innerHTML = rows;
-    }
-
-    (async () => {
+    async function loadTenistas() {
       try {
-        await loadConductores();
+        const data = await fetchJSON(`${API_BASE}/tenistas/`);
+        const tenistas = data.results || data;
+
+        if (!tenistas.length) {
+          document.querySelector("#tbody-tenistas").innerHTML =
+            `<tr><td colspan="5" style="text-align:center;">No hay tenistas</td></tr>`;
+          return;
+        }
+
+        const rows = tenistas.map(t => `
+          <tr>
+            <td>${t.id}</td>
+            <td>${t.nombre || ""}</td>
+            <td>${t.apellido || ""}</td>
+            <td>${t.correo || ""}</td>
+            <td>${t.numero || ""}</td>
+          </tr>
+        `).join("");
+
+        document.querySelector("#tbody-tenistas").innerHTML = rows;
       } catch (e) {
         console.error(e);
-        alert("No se pudo cargar información del API.");
+        document.querySelector("#tbody-tenistas").innerHTML =
+          `<tr><td colspan="5" style="text-align:center;color:red;">Error cargando tenistas</td></tr>`;
       }
-    })();
+    }
+
+    // inicia carga
+    loadTenistas();
   </script>
-  <script>
-    const token = localStorage.getItem("coord_token");
-    if (!token) {
-    window.location.href = "inicio_sesion.html";
-    }
-
-    // Al llamar a la API, envía el token:
-    fetch("https://cute-parrots-itch.loca.lt/api/solicitudes/", {
-    headers: {
-        "Accept": "application/json",
-        "Authorization": "Bearer " + token
-    }
-    });
-    </script>
-
-
-
-
-
-
-  <script src="/js/coordinador.js"></script>
 </body>
 </html>
