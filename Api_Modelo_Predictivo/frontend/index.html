@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>ATP Chile Open – Predicciones</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    body { background:#f8f9fa; }
+    header { background:#0d6efd; color:#fff; padding:24px 0; margin-bottom:24px; }
+    .card { border-radius:14px; box-shadow: 0 6px 18px rgba(0,0,0,.06); }
+    .stat { font-weight:800; font-size:1.4rem; }
+    .muted { color:#6c757d; }
+    .table td, .table th { vertical-align: middle; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1 class="h3 mb-1">ATP Chile Open – Sistema de Predicción</h1>
+      <div>Predice los orígenes y destinos más probables para logística de traslados</div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- Panel info del modelo (centrado, sin fecha de entrenamiento) -->
+    <div class="row justify-content-center g-3 mb-4">
+      <div class="col-md-4">
+        <div class="card p-3 text-center">
+          <div class="muted">Clases: Origen / Destino</div>
+          <div id="m_classes" class="stat">—</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card p-3 text-center">
+          <div class="muted">Métricas (F1)</div>
+          <div id="m_f1" class="stat">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tarjetas resumen -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <div class="card p-3">
+          <div class="muted mb-1">Origen más probable</div>
+          <div id="best_origen" class="stat">—</div>
+          <div id="best_origen_prob" class="muted">—</div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card p-3">
+          <div class="muted mb-1">Destino más probable</div>
+          <div id="best_destino" class="stat">—</div>
+          <div id="best_destino_prob" class="muted">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- Predicción ORIGEN -->
+      <div class="col-lg-6">
+        <div class="card p-4">
+          <h4 class="text-primary">Predicción de Origen</h4>
+
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="form-label">Día de la semana</label>
+              <select id="dia" class="form-select">
+                <option value="0">Lunes</option>
+                <option value="1">Martes</option>
+                <option value="2">Miércoles</option>
+                <option value="3">Jueves</option>
+                <option value="4">Viernes</option>
+                <option value="5">Sábado</option>
+                <option value="6">Domingo</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Hora</label>
+              <input type="time" id="hora" class="form-control" value="10:00">
+            </div>
+          </div>
+
+          <button class="btn btn-primary w-100 mt-3" id="btnOrigen">Predecir Origen</button>
+
+          <div class="mt-3">
+            <table class="table table-striped">
+              <thead class="table-light"><tr><th>ORIGEN</th><th>Probabilidad</th></tr></thead>
+              <tbody id="tablaOrigen"><tr><td colspan="2" class="text-muted">Sin datos</td></tr></tbody>
+            </table>
+          </div>
+
+          <canvas id="chartOrigen" height="140"></canvas>
+        </div>
+      </div>
+
+      <!-- Predicción DESTINO -->
+      <div class="col-lg-6">
+        <div class="card p-4">
+          <h4 class="text-success">Predicción de Destino</h4>
+
+          <div class="row g-3">
+            <div class="col-4">
+              <label class="form-label">Día</label>
+              <select id="dia_dest" class="form-select">
+                <option value="0">Lunes</option>
+                <option value="1">Martes</option>
+                <option value="2">Miércoles</option>
+                <option value="3">Jueves</option>
+                <option value="4">Viernes</option>
+                <option value="5">Sábado</option>
+                <option value="6">Domingo</option>
+              </select>
+            </div>
+            <div class="col-4">
+              <label class="form-label">Hora</label>
+              <input type="time" id="hora_dest" class="form-control" value="10:00">
+            </div>
+            <div class="col-4">
+              <label class="form-label">Origen</label>
+              <select id="origen" class="form-select"></select>
+            </div>
+          </div>
+
+          <button class="btn btn-success w-100 mt-3" id="btnDestino">Predecir Destino</button>
+
+          <div class="mt-3">
+            <table class="table table-striped">
+              <thead class="table-light"><tr><th>DESTINO</th><th>Probabilidad</th></tr></thead>
+              <tbody id="tablaDestino"><tr><td colspan="2" class="text-muted">Sin datos</td></tr></tbody>
+            </table>
+          </div>
+
+          <canvas id="chartDestino" height="140"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Historial -->
+    <div class="card p-4 mt-4">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Historial de consultas</h5>
+        <button id="clearHistory" class="btn btn-outline-secondary btn-sm">Limpiar historial</button>
+      </div>
+      <div class="table-responsive mt-3">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>Fecha/Hora</th><th>Día</th><th>Hora</th><th>Origen Top1</th><th>Destino Top1</th>
+            </tr>
+          </thead>
+          <tbody id="historialBody">
+            <tr><td colspan="5" class="text-muted">Sin consultas aún</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    const API = "http://127.0.0.1:8000";
+    let chartOrigen, chartDestino;
+    const dayNames = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
+
+    function hhToHour(intime) {
+      if(!intime) return 0;
+      const h = parseInt(String(intime).split(":")[0], 10);
+      return isNaN(h) ? 0 : h;
+    }
+    function pct(x){ return (x*100).toFixed(2) + "%"; }
+    function nowStr(){ return new Date().toLocaleString(); }
+
+    async function loadMetaMetrics(){
+      try{
+        const meta = await (await fetch(`${API}/meta`)).json();
+        const sel = document.getElementById("origen");
+        sel.innerHTML = "";
+        meta.origenes_validos_para_destino.forEach(o=>{
+          const op = document.createElement("option");
+          op.value=o; op.textContent=o; sel.appendChild(op);
+        });
+
+        const metrics = await (await fetch(`${API}/metrics`)).json();
+        document.getElementById("m_classes").textContent = `${metrics.num_clases.origen} / ${metrics.num_clases.destino}`;
+        const f1o = metrics?.origen?.f1_macro, f1d = metrics?.destino?.f1_macro;
+        document.getElementById("m_f1").textContent = (f1o && f1d) ? `Origen ${ (f1o*100).toFixed(1)}% · Destino ${ (f1d*100).toFixed(1)}%` : "No disponible";
+      } catch(e){
+        document.getElementById("m_classes").textContent = "—";
+        document.getElementById("m_f1").textContent = "—";
+      }
+    }
+
+    function renderTable(rows, containerId, key){
+      const tbody = document.getElementById(containerId);
+      if(!rows || rows.length===0){
+        tbody.innerHTML = `<tr><td colspan="2" class="text-muted">Sin datos</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = rows.map(r=>`<tr><td>${r[key]}</td><td>${pct(r.prob)}</td></tr>`).join("");
+    }
+
+    function renderBar(canvasId, labels, values, color){
+      const ctx = document.getElementById(canvasId).getContext('2d');
+      const data = { labels, datasets: [{ label: 'Probabilidad', data: values, borderWidth: 1, backgroundColor: color }] };
+      const opt = { scales: { y: { beginAtZero: true, ticks: { callback: v => v*100 + '%' }, max: 1 } } };
+      return new Chart(ctx, { type:'bar', data, options: opt });
+    }
+
+    function loadHistory(){
+      const tbody = document.getElementById("historialBody");
+      const hist = JSON.parse(localStorage.getItem("hist_atp") || "[]");
+      if(hist.length===0){ tbody.innerHTML = `<tr><td colspan="5" class="text-muted">Sin consultas aún</td></tr>`; return; }
+      tbody.innerHTML = hist.map(h=>`
+        <tr>
+          <td>${h.ts}</td><td>${h.dia}</td><td>${h.hora}</td>
+          <td>${h.origenTop1 ?? '—'}</td><td>${h.destinoTop1 ?? '—'}</td>
+        </tr>`).join("");
+    }
+    function pushHistory(entry){
+      const hist = JSON.parse(localStorage.getItem("hist_atp") || "[]");
+      hist.unshift(entry);
+      localStorage.setItem("hist_atp", JSON.stringify(hist.slice(0,30)));
+      loadHistory();
+    }
+    document.getElementById("clearHistory").addEventListener("click", ()=>{
+      localStorage.removeItem("hist_atp"); loadHistory();
+    });
+
+    document.getElementById("btnOrigen").addEventListener("click", async ()=>{
+      const dia = parseInt(document.getElementById("dia").value,10);
+      const hora = hhToHour(document.getElementById("hora").value);
+
+      const r = await fetch(`${API}/predict_origen`, {
+        method: "POST", headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ dia_semana: dia, hora_num: hora, top_n: 3 })
+      });
+      const data = await r.json();
+      const rows = data.predicciones || [];
+
+      renderTable(rows, "tablaOrigen", "origen");
+      if(chartOrigen) chartOrigen.destroy();
+      chartOrigen = renderBar("chartOrigen", rows.map(x=>x.origen), rows.map(x=>x.prob), "#0d6efd");
+
+      if(rows[0]){
+        document.getElementById("best_origen").textContent = rows[0].origen;
+        document.getElementById("best_origen_prob").textContent = pct(rows[0].prob);
+      }
+
+      const sel = document.getElementById("origen");
+      const top1 = rows[0]?.origen;
+      if([...sel.options].some(o=>o.value===top1)) sel.value = top1;
+
+      pushHistory({ ts: nowStr(), dia: dayNames[dia], hora: `${hora}:00`, origenTop1: rows[0]?.origen || "—", destinoTop1: "—" });
+    });
+
+    document.getElementById("btnDestino").addEventListener("click", async ()=>{
+      const dia = parseInt(document.getElementById("dia_dest").value,10);
+      const hora = hhToHour(document.getElementById("hora_dest").value);
+      const origen = document.getElementById("origen").value;
+
+      const r = await fetch(`${API}/predict_destino`, {
+        method: "POST", headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ dia_semana: dia, hora_num: hora, origen, top_n: 3 })
+      });
+      const data = await r.json();
+      const rows = data.predicciones || [];
+
+      renderTable(rows, "tablaDestino", "destino");
+      if(chartDestino) chartDestino.destroy();
+      chartDestino = renderBar("chartDestino", rows.map(x=>x.destino), rows.map(x=>x.prob), "#198754");
+
+      if(rows[0]){
+        document.getElementById("best_destino").textContent = rows[0].destino;
+        document.getElementById("best_destino_prob").textContent = pct(rows[0].prob);
+      }
+
+      const hist = JSON.parse(localStorage.getItem("hist_atp") || "[]");
+      if(hist[0]) { hist[0].destinoTop1 = rows[0]?.destino || "—"; localStorage.setItem("hist_atp", JSON.stringify(hist)); }
+      loadHistory();
+    });
+
+    loadMetaMetrics();
+    loadHistory();
+  </script>
+</body>
+</html>

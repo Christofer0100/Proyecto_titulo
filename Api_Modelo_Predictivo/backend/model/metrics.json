@@ -1,0 +1,5 @@
+{
+  "trained_at": "2025-09-15T00:00:00Z",
+  "origen": { "accuracy": 0.78, "f1_macro": 0.72 },
+  "destino": { "accuracy": 0.81, "f1_macro": 0.77 }
+}
