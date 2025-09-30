@@ -27,13 +27,13 @@
             </div>
 
             <div class="sidebar">
-                <a href="#">
+                <a href="/Api_Modelo_Predictivo/frontend/index.html" class="">
                     <span class="material-icons-sharp">
                         dashboard
                     </span>
                     <h3>Dashboard</h3>
                 </a>
-                <a href="#">
+                <a href="/tenistas.html">
                     <span class="material-icons-sharp">
                         person_outline
                     </span>
@@ -51,13 +51,13 @@
                     </span>
                     <h3>Solicitudes</h3>
                 </a>
-                <a href="#">
+                <a href="/reservas.html">
                     <span class="material-icons-sharp">
                         receipt_long
                     </span>
-                    <h3>Historial</h3>
+                    <h3>Reservas</h3>
                 </a>
-                <a href="#">
+                <a href="/inicio_sesion.html">
                     <span class="material-icons-sharp">
                         logout
                     </span>
@@ -120,7 +120,7 @@
 
 
     <script>
-    const API_BASE = "https://cute-parrots-itch.loca.lt/api";
+    const API_BASE = "https://applying-pens-tail-moss.trycloudflare.com/api";
 
     async function fetchJSON(url) {
       const r = await fetch(url, { headers: { "Accept": "application/json" } });
@@ -171,7 +171,7 @@
     }
 
     // Al llamar a la API, envía el token:
-    fetch("https://cute-parrots-itch.loca.lt/api/solicitudes/", {
+    fetch("https://applying-pens-tail-moss.trycloudflare.com/api/solicitudes/", {
     headers: {
         "Accept": "application/json",
         "Authorization": "Bearer " + token
