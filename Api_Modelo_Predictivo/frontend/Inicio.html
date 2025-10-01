@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ATP · Solicitudes</title>
+
+  <!-- Bootstrap 5.3 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    :root{
+      --sidebar:#cae9fd;
+      --bg:#f4f6fb;
+      --card:#ffffff;
+      --text:#1f2430;
+      --muted:#8a93a4;
+      --accent:#001d58;
+      --radius:16px;
+      --shadow: 0 12px 30px rgba(26,33,52,.08);
+    }
+    body{background:var(--bg); color:var(--text)}
+    .app{display:grid; grid-template-columns: 260px 1fr; min-height:100dvh}
+    .aside{background:var(--sidebar); border-right:1px solid #eef0f5; position:sticky; top:0; height:100dvh}
+    .brand{gap:.5rem}
+    .nav-link{color:#000000; border-radius:12px; padding:.65rem .9rem}
+    .nav-link.active{background:#cae9fd; color:var(--accent)}
+    .logout{position:absolute; bottom:1rem; left:1rem; right:1rem}
+    .topbar{display:flex; align-items:center; justify-content:space-between}
+    .user-chip{display:flex; align-items:center; gap:.6rem}
+    .user-chip .role{font-size:.8rem; color:var(--muted)}
+    .chip{display:inline-flex; align-items:center; gap:.35rem; background:#eef3ff; color:#2b57c5; border-radius:999px; padding:.35rem .6rem; font-size:.85rem}
+    .cardx{background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); border:1px solid #eef0f5}
+    .search-wrap{display:flex; align-items:center; gap:.8rem}
+    .search{max-width:340px}
+    .badge-state{background:#e8f0ff; color:#2563eb; font-weight:700; border-radius:999px; padding:.25rem .55rem}
+    .btn-assign{background:#e5f3da; color:#024704; border:none; border-radius:999px; padding:.35rem .9rem}
+    table thead th{color:#7a8193; font-weight:600}
+    @media (max-width: 992px){
+      .app{grid-template-columns: 80px 1fr}
+      .aside .label{display:none}
+      .brand span{display:none}
+      .logout{position:static}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="aside p-3">
+      <div class="d-flex align-items-center brand mb-4">
+        <img src="https://dummyimage.com/36x36/2d74ff/ffffff&text=A" alt="ATP" class="rounded-2"/>
+        <span class="fw-bold">ATP</span>
+      </div>
+      <nav class="nav flex-column gap-1">
+        <a class="nav-link d-flex align-items-center gap-2" href="modelo.html"><i class="bi bi-grid-1x2"></i><span class="label">Modelo predictivo</span></a>
+        <a class="nav-link d-flex align-items-center gap-2" href="#"><i class="bi bi-person"></i><span class="label">Tenista</span></a>
+        <a class="nav-link d-flex align-items-center gap-2" href="#"><i class="bi bi-people"></i><span class="label">Conductores</span></a>
+        <a class="nav-link active d-flex align-items-center gap-2" href="#"><i class="bi bi-clipboard-check"></i><span class="label">Solicitudes</span></a>
+        <a class="nav-link d-flex align-items-center gap-2" href="#"><i class="bi bi-calendar-check"></i><span class="label">Reservas</span></a>
+      </nav>
+      <div class="logout">
+        <a class="nav-link d-flex align-items-center gap-2" href="#"><i class="bi bi-box-arrow-right"></i><span class="label">Cerrar sesión</span></a>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="p-4">
+      <!-- Topbar -->
+      <div class="topbar mb-3">
+        <h1 class="h3 m-0">Solicitudes</h1>
+        <div class="user-chip">
+          <span class="chip"><i class="bi bi-moon-stars"></i> Modo</span>
+          <div>
+            <div class="fw-semibold">Hola, Coordinador</div>
+            <div class="role">Coordinador</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recomendación por día/hora (modelo) -->
+      <div class="cardx p-4 mb-4">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+          <h2 class="h5 m-0">Recomendación de origen según día y hora</h2>
+        </div>
+
+        <div class="row g-4 align-items-center">
+          <div class="col-12 col-lg-3">
+            <div class="text-secondary small">Día actual</div>
+            <div class="fw-bold fs-5" id="detectedDay">—</div>
+          </div>
+          <div class="col-12 col-lg-6">
+            <label class="form-label">Hora seleccionada: <span class="fw-bold" id="selectedHourLabel">14:00</span></label>
+            <input type="range" class="form-range" id="hourRange" min="0" max="23" step="1" value="14">
+            <div class="d-flex justify-content-between text-secondary small">
+              <span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>23:00</span>
+            </div>
+          </div>
+          <div class="col-12 col-lg-3 text-lg-end">
+            <button class="btn btn-primary" id="btnPredecirHora">Calcular recomendación</button>
+          </div>
+        </div>
+
+        <hr class="my-4">
+        <div id="resultadoModelo" class="alert alert-info mb-0" role="alert" style="display:none"></div>
+      </div>
+
+      <!-- Tabla de solicitudes (demo) -->
+      <div class="cardx p-3 p-lg-4">
+        <div class="d-flex flex-wrap align-items-center justify-content-between mb-3 gap-2">
+          <div class="search-wrap">
+            <div class="input-group search">
+              <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+              <input id="q" type="text" class="form-control" placeholder="Buscar por nombre o teléfono" />
+            </div>
+          </div>
+          <div class="text-secondary small"><span id="count">0</span> resultado(s)</div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Tenista</th>
+                <th>Teléfono</th>
+                <th>Hora salida</th>
+                <th>Origen</th>
+                <th>Destino</th>
+                <th>Estado</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal asignación -->
+  <div class="modal fade" id="asignarModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTitle">Asignar conductor</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Conductor</label>
+            <select class="form-select" id="selConductor">
+              <option>Eduardo Pozo</option>
+              <option>Tomás Olea</option>
+              <option>Christofer Lagos</option>
+            </select>
+          </div>
+          <div class="text-secondary small">* Ejemplo de interacción sin backend aún.</div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" id="btnConfirmAsignar" data-bs-dismiss="modal">Asignar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    /* ===========================
+       Datos mock para la tabla
+    ============================ */
+    const data = [
+      {id:18, nombre:'ricardo yamal', telefono:'946207861', hora:'14:00', origen:'club de tenis', destino:'hotel vitacura', estado:'NUEVA'},
+      {id:17, nombre:'Tomas Olea Riquelme', telefono:'946207861', hora:'14:00', origen:'Hotel el bosque', destino:'hotel vitacura', estado:'NUEVA'},
+      {id:16, nombre:'Benjamín aciapone', telefono:'946207861', hora:'14:30', origen:'Hotel el bosque', destino:'Club de tenis', estado:'NUEVA'},
+      {id:15, nombre:'Christian Lagos', telefono:'987554334', hora:'15:00', origen:'Club de tenis', destino:'Hotel', estado:'NUEVA'},
+      {id:14, nombre:'Tomas Olea Riquelme', telefono:'946207861', hora:'14:00', origen:'Aeropuerto', destino:'Club de tenis', estado:'NUEVA'},
+    ];
+
+    const tbody = document.getElementById('tbody');
+    const countEl = document.getElementById('count');
+    const q = document.getElementById('q');
+
+    // --- RENDER con botón dinámico (Asignar/Editar) ---
+    function render(rows){
+      tbody.innerHTML = rows.map(r=>{
+        const isAssigned = r.estado === 'ASIGNADA';
+        const btnText = isAssigned ? 'Editar' : 'Asignar';
+        const btnClass = isAssigned ? 'btn btn-warning btn-sm' : 'btn btn-assign btn-sm';
+        return `
+          <tr>
+            <td>${r.id}</td>
+            <td>${r.nombre}</td>
+            <td>${r.telefono}</td>
+            <td>${r.hora}</td>
+            <td>${r.origen}</td>
+            <td>${r.destino}</td>
+            <td><span class="badge-state">${r.estado}</span></td>
+            <td class="text-end">
+              <button class="${btnClass}" data-id="${r.id}" data-bs-toggle="modal" data-bs-target="#asignarModal">
+                ${btnText}
+              </button>
+            </td>
+          </tr>`;
+      }).join('');
+      countEl.textContent = rows.length;
+
+      tbody.querySelectorAll('button[data-id]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          selectedId = Number(btn.dataset.id);
+          const row = data.find(x=>x.id===selectedId);
+          document.getElementById('modalTitle').textContent =
+            (row && row.estado === 'ASIGNADA') ? 'Editar asignación' : 'Asignar conductor';
+        });
+      });
+    }
+
+    function filter(){
+      const term = q.value.trim().toLowerCase();
+      const rows = data.filter(r => r.nombre.toLowerCase().includes(term) || r.telefono.includes(term));
+      render(rows);
+    }
+    q.addEventListener('input', filter);
+
+    let selectedId = null;
+    document.getElementById('btnConfirmAsignar').addEventListener('click', ()=>{
+      if(selectedId==null) return;
+      const idx = data.findIndex(x=>x.id===selectedId);
+      if(idx>-1){
+        data[idx].estado = 'ASIGNADA';
+      }
+      filter();
+    });
+
+    // Inicial
+    render(data);
+
+    /* ============================================
+       MODELO: día detectado + hora -> recomendación
+    ============================================ */
+    const detectedDayEl = document.getElementById('detectedDay');
+    const hourRange = document.getElementById('hourRange');
+    const hourLabel = document.getElementById('selectedHourLabel');
+    const btnPredecirHora = document.getElementById('btnPredecirHora');
+    const resultadoModelo = document.getElementById('resultadoModelo');
+
+    const endpoint = 'http://127.0.0.1:8000/predict_origen';
+    const cachePred = {}; // { "3-14": { origin:"...", probability:0.73 } }
+
+    function dayNameEs(date){ return date.toLocaleDateString('es-CL', { weekday: 'long' }); }
+    function pad2(n){ return String(n).padStart(2,'0'); }
+    function diaSemanaParaAPI(date){ const jsDay = date.getDay(); return (jsDay + 6) % 7; } // 0=Lun..6=Dom
+
+    function setDetectedDay(){ const now = new Date(); detectedDayEl.textContent = dayNameEs(now); }
+    function setHourLabel(){ hourLabel.textContent = `${pad2(Number(hourRange.value))}:00`; }
+    setDetectedDay(); setHourLabel(); hourRange.addEventListener('input', setHourLabel);
+
+    function mostrarMensaje(diaTexto, hora, origin, prob){
+      const pctText = (typeof prob === 'number') ? ` (<strong>${Math.round(prob*100)}%</strong>)` : '';
+      const texto = `Hola coordinador. Hoy ${diaTexto} a las ${pad2(hora)}:00 es más probable que el origen sea <strong>${origin}</strong>${pctText}. Buen turno.`;
+      resultadoModelo.classList.remove('alert-warning');
+      resultadoModelo.classList.add('alert-info');
+      resultadoModelo.innerHTML = texto;
+      resultadoModelo.style.display = 'block';
+    }
+    function mostrarError(msg){
+      resultadoModelo.classList.remove('alert-info');
+      resultadoModelo.classList.add('alert-warning');
+      resultadoModelo.textContent = msg;
+      resultadoModelo.style.display = 'block';
+    }
+
+    async function predecir(){
+      const now = new Date();
+      const diaTexto = dayNameEs(now);
+      const diaAPI   = diaSemanaParaAPI(now);
+      const hora     = Number(hourRange.value);
+      const key = `${diaAPI}-${hora}`;
+
+      if (cachePred[key]) {
+        const { origin, probability } = cachePred[key];
+        mostrarMensaje(diaTexto, hora, origin, probability);
+        return;
+      }
+
+      btnPredecirHora.disabled = true;
+      const payload = { dia_semana: diaAPI, hora_num: hora, top_n: 1 };
+
+      try{
+        const res = await fetch(endpoint, {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify(payload)
+        });
+        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const data = await res.json();
+        const first = Array.isArray(data.predicciones) ? data.predicciones[0] : null;
+        const bestOrigin = first?.origen;
+        const prob = (typeof first?.probability === 'number') ? first.probability : null;
+
+        if(!bestOrigin){
+          mostrarError('El servicio no devolvió un origen en "predicciones[0]". Revisa la API.');
+          return;
+        }
+
+        cachePred[key] = { origin: bestOrigin, probability: prob };
+        mostrarMensaje(diaTexto, hora, bestOrigin, prob);
+      }catch(err){
+        console.error(err);
+        mostrarError('No se pudo consultar la recomendación. Revisa el endpoint del modelo.');
+      }finally{
+        btnPredecirHora.disabled = false;
+      }
+    }
+
+    btnPredecirHora.addEventListener('click', predecir);
+  </script>
+</body>
+</html>

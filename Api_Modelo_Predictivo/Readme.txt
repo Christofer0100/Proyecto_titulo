@@ -19,6 +19,8 @@
    - Swagger UI: http://127.0.0.1:8000/docs
    - Redoc:      http://127.0.0.1:8000/redoc
 
+Opcional: 
+rmdir .venv -Recurse -Force (Eliminar entorno virtual)
 
 
 
