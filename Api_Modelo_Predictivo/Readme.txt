@@ -1,27 +1,31 @@
-0. Crear entorno:
-   python -m venv .venv 
+Borrar entorno:
+   rmdir .venv -Recurse -Force
 
+Crear entorno:
+   py -3.13 -m venv .venv
 
-1. Activar el entorno virtual:
-   .\.venv\Scripts\Activate
    .\.venv\Scripts\activate
 
-
-2. Instalar dependencias (solo si cambió requirements.txt):
+Instaladores: 
    pip install -r requirements.txt
 
 
-3. Levantar el servidor FastAPI:
-   uvicorn main:app --reload
+Entrenar:
+   cd backend
+   python .\train_and_export.py
 
 
-4. Abrir en el navegador:
-   - Swagger UI: http://127.0.0.1:8000/docs
-   - Redoc:      http://127.0.0.1:8000/redoc
-
-Opcional: 
-rmdir .venv -Recurse -Force (Eliminar entorno virtual)
+Levantar la API (FastAPI + CORS):   
+   python -m uvicorn main:app --reload --port 8000
 
 
+Servir el frontend en otra terminal:
+   cd frontend
+   py -m http.server 5500
 
+consultar en verify_probabilities:
+   python verify_probabilities.py --kind origen --day 2 --hour 10
 
+Navegador:
+   http://127.0.0.1:8000/docs
+   http://127.0.0.1:5500/solicitudes.html

@@ -123,7 +123,6 @@
           <table class="table align-middle">
             <thead>
               <tr>
-                <th>ID</th>
                 <th>Tenista</th>
                 <th>Teléfono</th>
                 <th>Hora salida</th>
@@ -179,11 +178,10 @@
       {id:14, nombre:'Tomas Olea Riquelme', telefono:'946207861', hora:'14:00', origen:'Aeropuerto', destino:'Club de tenis', estado:'NUEVA'},
     ];
 
-    const tbody = document.getElementById('tbody');
+    const tbody   = document.getElementById('tbody');
     const countEl = document.getElementById('count');
-    const q = document.getElementById('q');
+    const q       = document.getElementById('q');
 
-    // --- RENDER con botón dinámico (Asignar/Editar) ---
     function render(rows){
       tbody.innerHTML = rows.map(r=>{
         const isAssigned = r.estado === 'ASIGNADA';
@@ -191,7 +189,6 @@
         const btnClass = isAssigned ? 'btn btn-warning btn-sm' : 'btn btn-assign btn-sm';
         return `
           <tr>
-            <td>${r.id}</td>
             <td>${r.nombre}</td>
             <td>${r.telefono}</td>
             <td>${r.hora}</td>
@@ -228,9 +225,7 @@
     document.getElementById('btnConfirmAsignar').addEventListener('click', ()=>{
       if(selectedId==null) return;
       const idx = data.findIndex(x=>x.id===selectedId);
-      if(idx>-1){
-        data[idx].estado = 'ASIGNADA';
-      }
+      if(idx>-1){ data[idx].estado = 'ASIGNADA'; }
       filter();
     });
 
@@ -240,26 +235,31 @@
     /* ============================================
        MODELO: día detectado + hora -> recomendación
     ============================================ */
-    const detectedDayEl = document.getElementById('detectedDay');
-    const hourRange = document.getElementById('hourRange');
-    const hourLabel = document.getElementById('selectedHourLabel');
-    const btnPredecirHora = document.getElementById('btnPredecirHora');
-    const resultadoModelo = document.getElementById('resultadoModelo');
+    const detectedDayEl  = document.getElementById('detectedDay');
+    const hourRange      = document.getElementById('hourRange');
+    const hourLabel      = document.getElementById('selectedHourLabel');
+    const btnPredecirHora= document.getElementById('btnPredecirHora');
+    const resultadoModelo= document.getElementById('resultadoModelo');
 
-    const endpoint = 'http://127.0.0.1:8000/predict_origen';
-    const cachePred = {}; // { "3-14": { origin:"...", probability:0.73 } }
+    // ✅ Endpoints FastAPI (con SLASH)
+    const endpointOrigen  = 'http://127.0.0.1:8000/predict/origen';
+    const endpointDestino = 'http://127.0.0.1:8000/predict/destino';
+
+    // Caché por combinación "dia-hora"
+    const cacheOrigen  = {}; // { "3-14": "Hotel..." }
+    const cacheDestino = {}; // { "3-14": "Club..." }
 
     function dayNameEs(date){ return date.toLocaleDateString('es-CL', { weekday: 'long' }); }
     function pad2(n){ return String(n).padStart(2,'0'); }
-    function diaSemanaParaAPI(date){ const jsDay = date.getDay(); return (jsDay + 6) % 7; } // 0=Lun..6=Dom
+    // JS getDay(): 0=domingo..6=sábado -> API: 0=lunes..6=domingo
+    function diaSemanaParaAPI(date){ return (date.getDay() + 6) % 7; }
 
-    function setDetectedDay(){ const now = new Date(); detectedDayEl.textContent = dayNameEs(now); }
+    function setDetectedDay(){ detectedDayEl.textContent = dayNameEs(new Date()); }
     function setHourLabel(){ hourLabel.textContent = `${pad2(Number(hourRange.value))}:00`; }
     setDetectedDay(); setHourLabel(); hourRange.addEventListener('input', setHourLabel);
 
-    function mostrarMensaje(diaTexto, hora, origin, prob){
-      const pctText = (typeof prob === 'number') ? ` (<strong>${Math.round(prob*100)}%</strong>)` : '';
-      const texto = `Hola coordinador. Hoy ${diaTexto} a las ${pad2(hora)}:00 es más probable que el origen sea <strong>${origin}</strong>${pctText}. Buen turno.`;
+    function mostrarMensaje(diaTexto, hora, originLbl, destLbl){
+      const texto = `Hola coordinador. Hoy ${diaTexto} a las ${pad2(hora)}:00 es más probable que el origen sea <strong>${originLbl}</strong> y el destino sea <strong>${destLbl}</strong>. Buen turno.`;
       resultadoModelo.classList.remove('alert-warning');
       resultadoModelo.classList.add('alert-info');
       resultadoModelo.innerHTML = texto;
@@ -272,44 +272,53 @@
       resultadoModelo.style.display = 'block';
     }
 
-    async function predecir(){
-      const now = new Date();
-      const diaTexto = dayNameEs(now);
-      const diaAPI   = diaSemanaParaAPI(now);
-      const hora     = Number(hourRange.value);
-      const key = `${diaAPI}-${hora}`;
+    async function pedir(endpoint, payload){
+      const res = await fetch(endpoint, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        // ✅ Payload que espera el backend: {"rows":[{dia_semana, hora_num}]}
+        body: JSON.stringify(payload)
+      });
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    }
 
-      if (cachePred[key]) {
-        const { origin, probability } = cachePred[key];
-        mostrarMensaje(diaTexto, hora, origin, probability);
+    async function predecir(){
+      const now  = new Date();
+      const diaT = dayNameEs(now);
+      const diaI = diaSemanaParaAPI(now);
+      const hora = Number(hourRange.value);
+      const key  = `${diaI}-${hora}`;
+
+      if (cacheOrigen[key] && cacheDestino[key]) {
+        mostrarMensaje(diaT, hora, cacheOrigen[key], cacheDestino[key]);
         return;
       }
 
       btnPredecirHora.disabled = true;
-      const payload = { dia_semana: diaAPI, hora_num: hora, top_n: 1 };
+      const payload = { rows: [ { dia_semana: diaI, hora_num: hora } ] };
 
       try{
-        const res = await fetch(endpoint, {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify(payload)
-        });
-        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+        const [oRes, dRes] = await Promise.all([
+          pedir(endpointOrigen,  payload),
+          pedir(endpointDestino, payload)
+        ]);
 
-        const data = await res.json();
-        const first = Array.isArray(data.predicciones) ? data.predicciones[0] : null;
-        const bestOrigin = first?.origen;
-        const prob = (typeof first?.probability === 'number') ? first.probability : null;
+        // ✅ Backend devuelve {"prediccion": ["texto", ...]}
+        const originLbl = Array.isArray(oRes?.prediccion) ? oRes.prediccion[0] : null;
+        const destLbl   = Array.isArray(dRes?.prediccion) ? dRes.prediccion[0] : null;
 
-        if(!bestOrigin){
-          mostrarError('El servicio no devolvió un origen en "predicciones[0]". Revisa la API.');
+        if(!originLbl || !destLbl){
+          mostrarError('El servicio no devolvió datos suficientes (prediccion). Revisa la API.');
           return;
         }
 
-        cachePred[key] = { origin: bestOrigin, probability: prob };
-        mostrarMensaje(diaTexto, hora, bestOrigin, prob);
+        cacheOrigen[key]  = originLbl;
+        cacheDestino[key] = destLbl;
+        mostrarMensaje(diaT, hora, originLbl, destLbl);
+
       }catch(err){
-        console.error(err);
+        console.error('predict fallo:', err);
         mostrarError('No se pudo consultar la recomendación. Revisa el endpoint del modelo.');
       }finally{
         btnPredecirHora.disabled = false;

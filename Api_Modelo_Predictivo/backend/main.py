@@ -1,120 +1,139 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
-import joblib
-import numpy as np
+# main.py
+# -*- coding: utf-8 -*-
+from __future__ import annotations
+
 from pathlib import Path
+from typing import List, Dict, Any
 
-# ---------------------------
-# Cargar modelos y encoders
-# ---------------------------
-BASE_DIR = Path(__file__).parent
-MODEL_DIR = BASE_DIR / "model"
+import pandas as pd
+from fastapi import FastAPI, Body
+from fastapi.middleware.cors import CORSMiddleware
+from joblib import load
 
-try:
-    modelo_origen = joblib.load(MODEL_DIR / "modelo_origen_rf.pkl")
-    le_origen_target = joblib.load(MODEL_DIR / "label_encoder_origen.pkl")
-except Exception as e:
-    raise RuntimeError(f"Error cargando modelo de ORIGEN: {e}")
+HERE = Path(__file__).resolve().parent
+MODEL_DIR = HERE / "model"
 
-try:
-    modelo_destino = joblib.load(MODEL_DIR / "modelo_destino_rf.pkl")
-    le_origen_feature = joblib.load(MODEL_DIR / "label_encoder_origen_feature.pkl")
-    le_destino_target = joblib.load(MODEL_DIR / "label_encoder_destino.pkl")
-except Exception as e:
-    raise RuntimeError(f"Error cargando modelo de DESTINO: {e}")
+ORIGEN_MODEL_PATH  = MODEL_DIR / "model_origen.pkl"
+DESTINO_MODEL_PATH = MODEL_DIR / "model_destino.pkl"
+META_PATH          = MODEL_DIR / "metadata.json"
 
-# ---------------------------
-# App & CORS
-# ---------------------------
-app = FastAPI(title="Modelo Predictivo ATP Chile Open")
+app = FastAPI(title="API Modelo Predictivo", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # en local, permite todo. En producción se restringe.
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ---------------------------
-# Esquemas de entrada
-# ---------------------------
-class InputOrigen(BaseModel):
-    dia_semana: int = Field(..., ge=0, le=6, description="0=Lun ... 6=Dom")
-    hora_num: int = Field(..., ge=0, le=23, description="0..23")
-    top_n: int = Field(3, ge=1, le=10)
+# ---------- Carga segura ----------
+def _safe_load(path: Path):
+    if not path.exists():
+        return None
+    try:
+        return load(path)
+    except Exception:
+        return None
 
-class InputDestino(BaseModel):
-    dia_semana: int = Field(..., ge=0, le=6)
-    hora_num: int = Field(..., ge=0, le=23)
-    origen: str
-    top_n: int = Field(3, ge=1, le=10)
+PIPE_ORIGEN  = _safe_load(ORIGEN_MODEL_PATH)
+PIPE_DESTINO = _safe_load(DESTINO_MODEL_PATH)
 
-# ---------------------------
-# Función auxiliar
-# ---------------------------
-def top_n_from_proba(probs: np.ndarray, enc, n: int, key_name: str):
-    idx = probs.argsort()[::-1][:n]
-    return [{key_name: enc.inverse_transform([i])[0], "prob": float(probs[i])} for i in idx]
+# ---------- Helpers ----------
+def _rows_to_df(rows: List[Dict[str, Any]]) -> pd.DataFrame:
+    """Rows -> DataFrame con columnas dia_semana y hora_num en int."""
+    df = pd.DataFrame(rows or [])
+    # normaliza tipos
+    df["dia_semana"] = pd.to_numeric(df.get("dia_semana", 0), errors="coerce").fillna(0).astype(int)
+    df["hora_num"]   = pd.to_numeric(df.get("hora_num", 0), errors="coerce").fillna(0).astype(int)
+    return df[["dia_semana", "hora_num"]]
 
-# ---------------------------
-# Endpoints
-# ---------------------------
+def _predict_with_proba(pipe, X: pd.DataFrame, top_n: int = 1):
+    """
+    Devuelve:
+      - yhat: labels top1 (lista)
+      - topk: lista de listas [{label, probability} ...] por fila
+    """
+    if pipe is None or X.empty:
+        return [], [[]]
+
+    # Predicción top1
+    yhat = pipe.predict(X)
+
+    # Probabilidades
+    topk_all = [[] for _ in range(len(X))]
+    try:
+        proba = pipe.predict_proba(X)  # shape (n, n_classes)
+        # clases en el estimador final del pipeline
+        clf = pipe.named_steps.get("clf", None)
+        classes = getattr(clf, "classes_", None) if clf is not None else None
+        if classes is None:
+            # fallback: intenta en el propio pipe (algunos wrappers exponen classes_)
+            classes = getattr(pipe, "classes_", None)
+
+        if classes is not None:
+            import numpy as np
+            for i, row in enumerate(proba):
+                # índices de clases ordenados por prob desc
+                idxs = np.argsort(row)[::-1][:max(1, top_n)]
+                topk_all[i] = [
+                    {"label": str(classes[j]), "probability": float(row[j])}
+                    for j in idxs
+                ]
+    except Exception:
+        # Si el estimador no soporta proba, dejamos topk vacío
+        pass
+
+    return list(map(str, yhat)), topk_all
+
+def _format_response(task: str, labels: List[str], topk_row: List[Dict[str, Any]]):
+    resp = {
+        "task": task,
+        "prediccion": [labels[0]] if labels else [],
+    }
+    if topk_row:
+        resp["top1"] = {
+            "label": topk_row[0]["label"],
+            "probability": topk_row[0].get("probability")
+        }
+        resp["topk"] = topk_row
+    return resp
+
+# ---------- Health ----------
 @app.get("/health")
 def health():
-    return {"status": "ok"}
-
-@app.get("/meta")
-def meta():
     return {
-        "origenes_disponibles_modelo_origen": list(le_origen_target.classes_),
-        "origenes_validos_para_destino": list(le_origen_feature.classes_),
-        "destinos_disponibles": list(le_destino_target.classes_),
+        "ok": True,
+        "model_origen_loaded": PIPE_ORIGEN is not None,
+        "model_destino_loaded": PIPE_DESTINO is not None,
+        "metadata_found": META_PATH.exists(),
     }
 
-@app.post("/predict_origen")
-def predict_origen(inp: InputOrigen):
-    Xq = np.array([[inp.hora_num, inp.dia_semana]])
-    try:
-        probs = modelo_origen.predict_proba(Xq)[0]
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al predecir origen: {e}")
-    return {"predicciones": top_n_from_proba(probs, le_origen_target, inp.top_n, "origen")}
-    
+# ---------- Endpoints ----------
+@app.post("/predict/origen")
+def predict_origen(
+    payload: Dict[str, Any] = Body(..., example={"rows":[{"dia_semana":2,"hora_num":10}],"top_n":1})
+):
+    rows  = payload.get("rows", [])
+    top_n = int(payload.get("top_n", 1))
+    X = _rows_to_df(rows)
+    yhat, topk = _predict_with_proba(PIPE_ORIGEN, X, top_n=top_n)
 
-@app.post("/predict_destino")
-def predict_destino(inp: InputDestino):
-    if inp.origen not in set(le_origen_feature.classes_):
-        raise HTTPException(status_code=400, detail=f"Origen '{inp.origen}' no reconocido por el modelo de destino.")
-    origen_enc = le_origen_feature.transform([inp.origen])[0]
-    Xq = np.array([[inp.hora_num, inp.dia_semana, origen_enc]])
-    try:
-        probs = modelo_destino.predict_proba(Xq)[0]
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al predecir destino: {e}")
-    return {"predicciones": top_n_from_proba(probs, le_destino_target, inp.top_n, "destino")}
+    if not yhat:
+        return {"task": "origen", "prediccion": []}
 
-import json
+    return _format_response("origen", yhat, topk[0])
 
-@app.get("/metrics")
-def metrics():
-    payload = {
-        "trained_at": None,
-        "origen": {"accuracy": None, "f1_macro": None},
-        "destino": {"accuracy": None, "f1_macro": None},
-        "num_clases": {
-            "origen": len(le_origen_target.classes_),
-            "destino": len(le_destino_target.classes_)
-        }
-    }
-    try:
-        with open(MODEL_DIR / "metrics.json", "r", encoding="utf-8") as f:
-            file_metrics = json.load(f)
-        payload.update(file_metrics)
-    except Exception:
-        # si no existe metrics.json, igual devolvemos el conteo de clases
-        pass
-    return payload
+@app.post("/predict/destino")
+def predict_destino(
+    payload: Dict[str, Any] = Body(..., example={"rows":[{"dia_semana":2,"hora_num":10}],"top_n":1})
+):
+    rows  = payload.get("rows", [])
+    top_n = int(payload.get("top_n", 1))
+    X = _rows_to_df(rows)
+    yhat, topk = _predict_with_proba(PIPE_DESTINO, X, top_n=top_n)
 
- 
+    if not yhat:
+        return {"task": "destino", "prediccion": []}
+
+    return _format_response("destino", yhat, topk[0])

@@ -3,53 +3,47 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ATP · Solicitudes</title>
-  <!-- Bootstrap 5.3 -->
+  <title>ATP · Modelo (Pro)</title>
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
   <style>
     :root{
-      --sidebar:#ffffff;
-      --bg:#f4f6fb;
-      --card:#ffffff;
-      --text:#1f2430;
-      --muted:#8a93a4;
-      --accent:#2d74ff;
-      --accent-2:#4caf50;
-      --badge:#2563eb;
-      --badge-bg:#e8f0ff;
-      --radius:16px;
-      --shadow: 0 12px 30px rgba(26,33,52,.08);
+      --sidebar:#cae9fd; --bg:#f5f7fb; --card:#ffffff; --text:#1f2430;
+      --muted:#8a93a4; --accent:#2b57c5; --accent2:#0d6efd;
+      --radius:16px; --shadow:0 16px 40px rgba(26,33,52,.08);
+      --soft:#eef3ff;
     }
     body{background:var(--bg); color:var(--text)}
-    .app{display:grid; grid-template-columns: 260px 1fr; min-height:100dvh}
-    /* Sidebar */
+    .app{display:grid; grid-template-columns:260px 1fr; min-height:100dvh}
     .aside{background:var(--sidebar); border-right:1px solid #eef0f5; position:sticky; top:0; height:100dvh}
     .brand{gap:.5rem}
-    .nav-link{color:#5b6475; border-radius:12px; padding:.65rem .9rem}
-    .nav-link.active{background:#eef3ff; color:var(--accent)}
+    .nav-link{color:#000; border-radius:12px; padding:.65rem .9rem}
+    .nav-link.active{background:#cae9fd; color:#001d58}
     .logout{position:absolute; bottom:1rem; left:1rem; right:1rem}
-    /* Header */
-    .topbar{display:flex; align-items:center; justify-content:space-between}
-    .user-chip{display:flex; align-items:center; gap:.6rem}
-    .user-chip .role{font-size:.8rem; color:var(--muted)}
-    .chip{display:inline-flex; align-items:center; gap:.35rem; background:#eef3ff; color:#2b57c5; border-radius:999px; padding:.35rem .6rem; font-size:.85rem}
-    /* Cards */
+
     .cardx{background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); border:1px solid #eef0f5}
-    .stat{display:flex; align-items:center; gap:1rem}
-    .radial{--p:0.68; width:64px; height:64px; border-radius:50%; background:conic-gradient(var(--accent) calc(var(--p)*1turn), #e9edf7 0); display:grid; place-items:center}
-    .radial small{font-weight:700; color:var(--accent)}
-    .radial.green{background:conic-gradient(var(--accent-2) calc(var(--p)*1turn), #e9edf7 0)}
-    .metric{font-size:26px; font-weight:800}
-    /* Search & table */
-    .search-wrap{display:flex; align-items:center; gap:.8rem}
-    .search{max-width:340px}
-    .badge-state{background:var(--badge-bg); color:var(--badge); font-weight:700; border-radius:999px; padding:.25rem .55rem}
-    .btn-assign{background:#e5f3da; color:#2f7d32; border:none; border-radius:999px; padding:.35rem .9rem}
-    table thead th{color:#7a8193; font-weight:600}
+    .header-bar{display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:1rem}
+    .chip{display:inline-flex; align-items:center; gap:.4rem; padding:.35rem .6rem; border-radius:999px; background:var(--soft); color:var(--accent); font-weight:600; font-size:.9rem}
+    .muted{color:var(--muted)}
+    .badge-soft{background:#f1f3ff; color:#3b3f5c; font-weight:600}
+    .big{font-size:1.8rem; font-weight:800; letter-spacing:.2px}
+    .pct{font-weight:800}
+    .kpi{display:flex; align-items:center; gap:.6rem; padding:.75rem 1rem; border-radius:12px; background:#f7f9ff; border:1px solid #ecf1ff}
+    .progress{height:10px; background:#edf0f6}
+    .progress-bar{background:linear-gradient(90deg, var(--accent), var(--accent2))}
+    .tip{font-size:.85rem; color:var(--muted)}
+    /* skeleton */
+    .skeleton{position:relative; overflow:hidden; background:#edf0f6; border-radius:8px}
+    .skeleton::after{content:""; position:absolute; inset:0; transform:translateX(-100%);
+      background:linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent);
+      animation:shimmer 1.1s infinite}
+    @keyframes shimmer{100%{transform:translateX(100%)}}
+
     @media (max-width: 992px){
-      .app{grid-template-columns: 80px 1fr}
+      .app{grid-template-columns:80px 1fr}
       .aside .label{display:none}
       .brand span{display:none}
       .logout{position:static}
@@ -58,14 +52,14 @@
 </head>
 <body>
   <div class="app">
-    <!-- Sidebar -->
+    <!-- ==== ASIDE (tal cual) ==== -->
     <aside class="aside p-3">
       <div class="d-flex align-items-center brand mb-4">
         <img src="https://dummyimage.com/36x36/2d74ff/ffffff&text=A" alt="ATP" class="rounded-2"/>
         <span class="fw-bold">ATP</span>
       </div>
       <nav class="nav flex-column gap-1">
-        <a class="nav-link d-flex align-items-center gap-2" href="modelo.html"><i class="bi bi-grid-1x2"></i><span class="label">Modelo Predictivo</span></a>
+        <a class="nav-link d-flex align-items-center gap-2" href="modelo.html"><i class="bi bi-grid-1x2"></i><span class="label">Modelo predictivo</span></a>
         <a class="nav-link d-flex align-items-center gap-2" href="#"><i class="bi bi-person"></i><span class="label">Tenista</span></a>
         <a class="nav-link d-flex align-items-center gap-2" href="#"><i class="bi bi-people"></i><span class="label">Conductores</span></a>
         <a class="nav-link active d-flex align-items-center gap-2" href="Inicio.html"><i class="bi bi-clipboard-check"></i><span class="label">Solicitudes</span></a>
@@ -76,63 +70,310 @@
       </div>
     </aside>
 
-    <!-- Main -->
+    <!-- ==== MAIN ==== -->
     <main class="p-4">
-      <!-- Topbar -->
-      <div class="topbar mb-3">
-        <h1 class="h3 m-0">Solicitudes</h1>
-        <div class="user-chip">
-          <span class="chip"><i class="bi bi-moon-stars"></i> Modo</span>
-          <div>
-            <div class="fw-semibold">Hola, Helena</div>
-            <div class="role">Coordinador</div>
+      <!-- Header -->
+      <div class="header-bar">
+        <h1 class="h4 m-0">Modelo Predictivo</h1>
+        <div class="d-flex gap-2">
+          <span class="chip"><i class="bi bi-robot"></i> Calibrado</span>
+          <span class="chip"><i class="bi bi-activity"></i> Probabilidades</span>
+        </div>
+      </div>
+
+      <!-- Controles + KPIs -->
+      <div class="cardx p-4 mb-4">
+        <div class="row g-3 align-items-end">
+          <div class="col-12 col-lg-3">
+            <label class="form-label">Día</label>
+            <select id="selDia" class="form-select">
+              <option value="0">Lunes</option>
+              <option value="1">Martes</option>
+              <option value="2">Miércoles</option>
+              <option value="3">Jueves</option>
+              <option value="4">Viernes</option>
+              <option value="5">Sábado</option>
+              <option value="6">Domingo</option>
+            </select>
+            <div class="tip mt-1"><i class="bi bi-info-circle"></i> Convención: 0=lun .. 6=dom</div>
+          </div>
+          <div class="col-12 col-lg-4">
+            <label class="form-label">Hora seleccionada</label>
+            <input type="range" id="rngHora" class="form-range" min="0" max="23" step="1" value="14">
+            <div class="d-flex justify-content-between">
+              <small class="muted">00:00</small>
+              <small class="muted">06:00</small>
+              <small class="muted">12:00</small>
+              <small class="muted">18:00</small>
+              <small class="muted">23:00</small>
+            </div>
+          </div>
+          <div class="col-6 col-lg-2">
+            <label class="form-label">Hora</label>
+            <input type="text" class="form-control" id="lblHora" value="14:00" readonly>
+          </div>
+          <div class="col-12 col-lg-3 d-grid d-lg-flex gap-2 justify-content-lg-end">
+            <button id="btnCalcular" class="btn btn-primary"><i class="bi bi-lightning-charge"></i> Calcular</button>
+            <button id="btnExplorar" class="btn btn-outline-secondary"><i class="bi bi-graph-up"></i> Explorar día</button>
+          </div>
+        </div>
+
+        <div class="row g-3 mt-3">
+          <div class="col-12 col-md-6">
+            <div class="kpi"><i class="bi bi-geo-alt"></i><div>
+              <div class="small muted">Origen más probable</div>
+              <div id="kpiOrigen" class="fw-bold">—</div>
+            </div></div>
+          </div>
+          <div class="col-12 col-md-6">
+            <div class="kpi"><i class="bi bi-geo-alt"></i><div>
+              <div class="small muted">Destino más probable</div>
+              <div id="kpiDestino" class="fw-bold">—</div>
+            </div></div>
+          </div>
+        </div>
+        <div id="msg" class="tip mt-3">Listo.</div>
+      </div>
+
+      <!-- Predicción puntual -->
+      <div class="row g-4">
+        <div class="col-12 col-xl-6">
+          <div class="cardx p-4 h-100">
+            <div class="d-flex align-items-center justify-content-between">
+              <span class="muted fw-semibold">Origen</span>
+              <span class="badge badge-soft rounded-pill" id="badgeO">—</span>
+            </div>
+            <div class="mt-3">
+              <div class="d-flex align-items-baseline gap-3">
+                <div id="origenLabel" class="big">—</div>
+                <div id="origenPct" class="pct text-primary">—%</div>
+              </div>
+              <div class="progress mt-3">
+                <div id="origenBar" class="progress-bar" style="width:0%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-xl-6">
+          <div class="cardx p-4 h-100">
+            <div class="d-flex align-items-center justify-content-between">
+              <span class="muted fw-semibold">Destino</span>
+              <span class="badge badge-soft rounded-pill" id="badgeD">—</span>
+            </div>
+            <div class="mt-3">
+              <div class="d-flex align-items-baseline gap-3">
+                <div id="destinoLabel" class="big">—</div>
+                <div id="destinoPct" class="pct text-primary">—%</div>
+              </div>
+              <div class="progress mt-3">
+                <div id="destinoBar" class="progress-bar" style="width:0%"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- KPI cards -->
-      <div class="row g-3 mb-4">
-        <div class="col-12 col-lg-4">
-          <div class="cardx p-4">
-            <div class="stat">
-              <div class="radial green" id="radial-km"><small id="pct-km">+64%</small></div>
-              <div>
-                <div class="text-uppercase small text-secondary">Kilómetros recorridos</div>
-                <div class="metric" id="km">625 KM</div>
-              </div>
-            </div>
+      <!-- Timeline -->
+      <div class="cardx p-4 mt-4">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+          <h2 class="h6 m-0">Exploración del día (24 h)</h2>
+          <div class="small muted">
+            <span class="me-3"><span class="badge rounded-pill text-bg-primary">Origen</span></span>
+            <span><span class="badge rounded-pill text-bg-warning text-dark">Destino</span></span>
           </div>
         </div>
-        <div class="col-12 col-lg-4">
-          <div class="cardx p-4">
-            <div class="stat">
-              <div class="radial" id="radial-coord"><small id="pct-coord">68%</small></div>
-              <div>
-                <div class="text-uppercase small text-secondary">Viajes coordinados</div>
-                <div class="metric" id="coord">14</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-12 col-lg-4">
-          <div class="cardx p-4">
-            <div class="stat">
-              <div class="radial" id="radial-total"><small id="pct-total">+21%</small></div>
-              <div>
-                <div class="text-uppercase small text-secondary">Viajes totales</div>
-                <div class="metric" id="total">320</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <canvas id="chartDay" height="110"></canvas>
+        <div id="labelsLinea" class="d-flex flex-wrap gap-2 mt-3"></div>
       </div>
 
+      <div class="mt-4 tip">
       </div>
     </main>
   </div>
 
+  <script>
+    // ======= Config endpoints =======
+    const API_ORIGEN  = 'http://127.0.0.1:8000/predict/origen';
+    const API_DESTINO = 'http://127.0.0.1:8000/predict/destino';
 
+    // ======= DOM refs =======
+    const selDia = document.getElementById('selDia');
+    const rngHora = document.getElementById('rngHora');
+    const lblHora = document.getElementById('lblHora');
+    const btnCalcular = document.getElementById('btnCalcular');
+    const btnExplorar = document.getElementById('btnExplorar');
+    const msg = document.getElementById('msg');
 
+    const kpiOrigen = document.getElementById('kpiOrigen');
+    const kpiDestino = document.getElementById('kpiDestino');
 
+    const origenLabel = document.getElementById('origenLabel');
+    const destinoLabel = document.getElementById('destinoLabel');
+    const origenPct = document.getElementById('origenPct');
+    const destinoPct = document.getElementById('destinoPct');
+    const origenBar = document.getElementById('origenBar');
+    const destinoBar = document.getElementById('destinoBar');
+    const badgeO = document.getElementById('badgeO');
+    const badgeD = document.getElementById('badgeD');
+
+    const labelsLinea = document.getElementById('labelsLinea');
+
+    // ======= Helpers =======
+    const cache = {}; // key: "d-h" -> { origen:{label, prob}, destino:{label, prob} }
+
+    function pad2(n){ return String(n).padStart(2,'0'); }
+    function toPctNum(x){ if(typeof x!=='number'||isNaN(x)) return null; return x>1?x:(x*100); }
+    function toPctText(x){ const v=toPctNum(x); return v===null?'—%':`${v.toFixed(2)}%`; }
+    function setHourLabel(){ lblHora.value = `${pad2(+rngHora.value)}:00`; }
+    rngHora.addEventListener('input', setHourLabel);
+
+    (function initNow(){
+      const jsDay = new Date().getDay(); // 0=dom..6=sab
+      selDia.value = String((jsDay + 6) % 7);
+      const now = new Date();
+      rngHora.value = now.getHours();
+      setHourLabel();
+    })();
+
+    function pickLabelAndProb(res, kind){
+      if(res?.top1?.label){
+        return { label: res.top1.label, prob: res.top1.probability ?? res.top1.prob ?? res.top1.proba };
+      }
+      if(Array.isArray(res?.predicciones) && res.predicciones.length){
+        const it = res.predicciones[0];
+        const lbl = it.label ?? it[kind] ?? null;
+        const p = it.probability ?? it.prob ?? it.proba;
+        return { label: lbl, prob: p };
+      }
+      if(Array.isArray(res?.prediccion) && res.prediccion.length){
+        return { label: res.prediccion[0], prob: undefined };
+      }
+      return { label: null, prob: undefined };
+    }
+
+    async function postJSON(url, payload){
+      const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    }
+
+    function setLoading(on){
+      if(on){
+        msg.textContent='Consultando…';
+        btnCalcular.disabled = true; btnExplorar.disabled = true;
+        origenBar.classList.add('skeleton'); destinoBar.classList.add('skeleton');
+      }else{
+        btnCalcular.disabled = false; btnExplorar.disabled = false;
+        origenBar.classList.remove('skeleton'); destinoBar.classList.remove('skeleton');
+      }
+    }
+
+    function paintPoint(o, d, day, hour){
+      origenLabel.textContent = o.label ?? '—';
+      destinoLabel.textContent = d.label ?? '—';
+
+      const po = toPctNum(o.prob); const pd = toPctNum(d.prob);
+      origenPct.textContent = toPctText(o.prob); destinoPct.textContent = toPctText(d.prob);
+      origenBar.style.width = po===null?'0%':`${po.toFixed(2)}%`;
+      destinoBar.style.width = pd===null?'0%':`${pd.toFixed(2)}%`;
+      origenBar.setAttribute('aria-valuenow', po ?? 0);
+      destinoBar.setAttribute('aria-valuenow', pd ?? 0);
+
+      badgeO.textContent = `Día ${day} · ${pad2(hour)}:00`;
+      badgeD.textContent = `Día ${day} · ${pad2(hour)}:00`;
+
+      // KPIs
+      kpiOrigen.textContent = o.label ?? '—';
+      kpiDestino.textContent = d.label ?? '—';
+    }
+
+    async function calcularPuntual(){
+      const d = +selDia.value; const h = +rngHora.value; const key = `${d}-${h}`;
+      setLoading(true);
+      try{
+        if(!cache[key]){
+          const payload = { rows:[{dia_semana:d, hora_num:h}], top_n:1, with_proba:true };
+          const [oRes, dRes] = await Promise.all([ postJSON(API_ORIGEN,payload), postJSON(API_DESTINO,payload) ]);
+          cache[key] = { origen: pickLabelAndProb(oRes,'origen'), destino: pickLabelAndProb(dRes,'destino') };
+        }
+        paintPoint(cache[key].origen, cache[key].destino, d, h);
+        msg.textContent='Listo.';
+      }catch(e){
+        console.error(e); msg.textContent='Error consultando el servicio.';
+      }finally{ setLoading(false); }
+    }
+
+    // ======= Timeline 24h =======
+    let dayChart;
+    function mapToIndex(a,b){
+      const set = new Set([...a,...b]); const labels = Array.from(set);
+      const m = new Map(labels.map((v,i)=>[v,i]));
+      return { labels, a: a.map(v=>m.get(v)), b: b.map(v=>m.get(v)) };
+    }
+
+    function renderTimeline(hours, oLabels, dLabels){
+      const ctx = document.getElementById('chartDay').getContext('2d');
+      const map = mapToIndex(oLabels, dLabels);
+      if(dayChart) dayChart.destroy();
+      dayChart = new Chart(ctx, {
+        type:'line',
+        data:{
+          labels: hours.map(h=>`${pad2(h)}:00`),
+          datasets:[
+            { label:'Origen', data:map.a, borderWidth:2, tension:0, stepped:true },
+            { label:'Destino', data:map.b, borderWidth:2, tension:0, stepped:true }
+          ]
+        },
+        options:{
+          scales:{ y:{ ticks:{ callback:(v)=>map.labels[v]??'' }, beginAtZero:true, precision:0 } },
+          plugins:{
+            legend:{ position:'top' },
+            tooltip:{ callbacks:{ label:(ctx)=>`${ctx.dataset.label}: ${map.labels[ctx.parsed.y]??''}` } }
+          }
+        }
+      });
+
+      labelsLinea.innerHTML='';
+      hours.forEach((h,i)=>{
+        const pill=document.createElement('span');
+        pill.className='badge text-bg-light border me-2 mb-2';
+        pill.innerHTML=`<strong>${pad2(h)}:00</strong> · <span class="text-primary">${oLabels[i]}</span> | <span class="text-warning">${dLabels[i]}</span>`;
+        labelsLinea.appendChild(pill);
+      });
+    }
+
+    async function explorarDia(){
+      const d = +selDia.value; const hours = [...Array(24).keys()];
+      const oL=[]; const dL=[];
+      setLoading(true);
+      try{
+        for(let h=0; h<24; h++){
+          const key=`${d}-${h}`;
+          if(!cache[key]){
+            const payload = { rows:[{dia_semana:d, hora_num:h}], top_n:1, with_proba:true };
+            const [oRes, dRes] = await Promise.all([ postJSON(API_ORIGEN,payload), postJSON(API_DESTINO,payload) ]);
+            cache[key] = { origen: pickLabelAndProb(oRes,'origen'), destino: pickLabelAndProb(dRes,'destino') };
+          }
+          oL.push(cache[key].origen.label ?? '—');
+          dL.push(cache[key].destino.label ?? '—');
+          msg.textContent = `Explorando el día… ${h+1}/24`;
+        }
+        renderTimeline(hours, oL, dL);
+        msg.textContent='Listo.';
+      }catch(e){
+        console.error(e); msg.textContent='No se pudo explorar el día.';
+      }finally{ setLoading(false); }
+    }
+
+    // Eventos
+    btnCalcular.addEventListener('click', calcularPuntual);
+    btnExplorar.addEventListener('click', explorarDia);
+    selDia.addEventListener('change', calcularPuntual);
+    rngHora.addEventListener('change', ()=>{ setHourLabel(); calcularPuntual(); });
+
+    // Primera carga
+    calcularPuntual();
+  </script>
 </body>
 </html>

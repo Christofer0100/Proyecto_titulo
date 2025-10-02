@@ -1,0 +1,23 @@
+{
+  "source_csv": "ReservasAtp.csv",
+  "separator": ",",
+  "columns_detected": {
+    "datetime": "FECHA",
+    "hour": "HORA",
+    "origen": "ORIGEN",
+    "destino": "DESTINO"
+  },
+  "features": [
+    "dia_semana (0=lun..6=dom)",
+    "hora_num (0..23)"
+  ],
+  "models": {
+    "origen": null,
+    "destino": null
+  },
+  "calibrated": {
+    "method": "isotonic",
+    "cv": 5,
+    "base_estimator": "RandomForestClassifier(n_estimators=300, random_state=42)"
+  }
+}
