@@ -27,11 +27,11 @@
             </div>
 
             <div class="sidebar">
-                <a href="/Api_Modelo_Predictivo/frontend/index.html">
+                <a href="/Api_Modelo_Predictivo/frontend/modelo.html">
                     <span class="material-icons-sharp">
                         dashboard
                     </span>
-                    <h3>Dashboard</h3>
+                    <h3>Predicción</h3>
                 </a>
                 <a href="/tenistas.html">
                     <span class="material-icons-sharp">
@@ -119,7 +119,7 @@
     </div>
 
   <script>
-    const API_BASE = "https://energy-vic-guide-gentleman.trycloudflare.com/api";  // cámbialo a tu endpoint
+    const API_BASE = "https://upgrade-fruits-completed-orchestra.trycloudflare.com/api";  // cámbialo a tu endpoint
     const TOKEN = localStorage.getItem("coord_token") || "";
 
     async function fetchJSON(url, opts = {}) {
@@ -169,5 +169,6 @@
     // inicia carga al abrir página
     loadReservas();
   </script>
+  <script src="/js/coordinador.js"></script>
     </body>
 </html>

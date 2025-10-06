@@ -27,11 +27,11 @@
             </div>
 
             <div class="sidebar">
-                <a href="/Api_Modelo_Predictivo/frontend/index.html" class="">
+                <a href="/Api_Modelo_Predictivo/frontend/modelo.html">
                     <span class="material-icons-sharp">
                         dashboard
                     </span>
-                    <h3>Dashboard</h3>
+                    <h3>Predicción</h3>
                 </a>
                 <a href="/tenistas.html">
                     <span class="material-icons-sharp">
@@ -79,7 +79,6 @@
                                 <th>Mail</th>
                                 <th>Teléfono</th>
                                 <th>Activo</th>
-                                <th>Creado</th>
                             </tr>
                             </thead>
                             <tbody></tbody>
@@ -120,7 +119,7 @@
 
 
     <script>
-    const API_BASE = "https://energy-vic-guide-gentleman.trycloudflare.com/api";
+    const API_BASE = "https://upgrade-fruits-completed-orchestra.trycloudflare.com/api";
 
     async function fetchJSON(url) {
       const r = await fetch(url, { headers: { "Accept": "application/json" } });
@@ -149,7 +148,6 @@
           <td>${c.mail}</td>
           <td>${c.telefono || ""}</td>
           <td>${c.activo ? "Sí" : "No"}</td>
-          <td>${fmtDate(c.created_at)}</td>
         </tr>
       `).join("");
       document.querySelector("#tbl-conductores tbody").innerHTML = rows;
@@ -171,7 +169,7 @@
     }
 
     // Al llamar a la API, envía el token:
-    fetch("https://energy-vic-guide-gentleman.trycloudflare.com/api/solicitudes/", {
+    fetch("https://upgrade-fruits-completed-orchestra.trycloudflare.com/api/solicitudes/", {
     headers: {
         "Accept": "application/json",
         "Authorization": "Bearer " + token
