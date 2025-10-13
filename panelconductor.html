@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Panel Conductor - ATP</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
+  <link rel="stylesheet" href="css/cdr.css">
+</head>
+<body>
+  <div class="container">
+    <aside>
+      <div class="logo"><h2>ATP <span class="primary">Conductor</span></h2></div>
+      <div class="sidebar">
+        <a href="#" class="active"><span class="material-icons-sharp">directions_car</span><h3>Mis viajes</h3></a>
+        <a href="loginconductor.html" onclick="cerrarSesion()"><span class="material-icons-sharp">logout</span><h3>Salir</h3></a>
+      </div>
+    </aside>
+
+    <main>
+      <h1>Mis viajes</h1>
+      <table class="table">
+        <thead>
+          <tr><th>ID</th><th>Origen</th><th>Destino</th><th>Fecha</th><th>Estado</th><th>Acción</th></tr>
+        </thead>
+        <tbody id="tbody-viajes">
+          <tr><td colspan="6" style="text-align:center;">Cargando viajes...</td></tr>
+        </tbody>
+      </table>
+    </main>
+  </div>
+
+<script>
+// 🔹 URL base de tu API (ajústala si usas otro túnel o dominio)
+const API_BASE = "https://alarm-retained-behaviour-advisor.trycloudflare.com/api";
+
+// 🔹 Obtener datos del conductor desde el login (guardado en localStorage)
+const conductorData = JSON.parse(localStorage.getItem("conductor"));
+const conductorId = conductorData?.id;
+
+// 🔹 Si no hay sesión, redirigir al login
+if (!conductorId) {
+  alert("Por favor, inicia sesión nuevamente.");
+  window.location.href = "loginconductor.html";
+}
+
+// 🔹 Función para abrir Google Maps con el destino
+function abrirMaps(destino) {
+  if (!destino) {
+    alert("Este viaje no tiene destino definido.");
+    return;
+  }
+  const destinoEncoded = encodeURIComponent(destino);
+  const mapsURL = `https://www.google.com/maps/dir/?api=1&destination=${destinoEncoded}`;
+  window.open(mapsURL, "_blank");
+}
+
+// 🔹 Cargar viajes desde la API filtrados por conductor logueado
+async function cargarViajes() {
+  const tbody = document.getElementById("tbody-viajes");
+  tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">Cargando viajes...</td></tr>`;
+  
+  try {
+    const res = await fetch(`${API_BASE}/reservas/?conductor=${conductorId}`);
+    if (!res.ok) throw new Error(`Error HTTP ${res.status}`);
+    const data = await res.json();
+
+    // Compatibilidad con backend que puede devolver 'results' o lista directa
+    const viajes = Array.isArray(data.results) ? data.results : data;
+
+    if (!viajes.length) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No hay viajes asignados</td></tr>`;
+      return;
+    }
+
+    // 🔹 Generar filas con datos claros
+    const rows = viajes.map(v => `
+      <tr>
+        <td>${v.id}</td>
+        <td>${v.solicitud_origen || v.solicitud?.origen?.salida || '-'}</td>
+        <td>${v.solicitud_destino || v.solicitud?.destino?.lugar || '-'}</td>
+        <td>${new Date(v.fecha_hora_agendada).toLocaleString()}</td>
+        <td>${v.estado}</td>
+        <td>
+          ${v.estado === "ASIGNADA"
+            ? `<button onclick="abrirMaps('${v.solicitud_destino || v.solicitud?.destino?.lugar}')" 
+                 class="btn btn-success btn-sm">Iniciar viaje</button>`
+            : `<span class="muted">${v.estado}</span>`}
+        </td>
+      </tr>
+    `).join('');
+    
+    tbody.innerHTML = rows;
+  } catch (err) {
+    console.error("Error al cargar viajes:", err);
+    tbody.innerHTML = `<tr><td colspan="6" style="color:red;text-align:center;">
+      Error cargando viajes (${err.message})
+    </td></tr>`;
+  }
+}
+
+// 🔹 Función para cerrar sesión
+function cerrarSesion() {
+  localStorage.removeItem("conductor");
+  window.location.href = "loginconductor.html";
+}
+
+// 🔹 Ejecutar carga al iniciar
+cargarViajes();
+</script>
+</body>
+</html>

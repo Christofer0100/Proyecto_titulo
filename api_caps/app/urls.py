@@ -24,6 +24,7 @@ from app.views import (
 from .views import ReservaViewSet
 from .views import ReservaListView
 from .views import TenistaListView
+from .views import login_conductor
 
 router = DefaultRouter()
 router.register(r'coordinadores', CoordinadorViewSet, basename='coordinador')
@@ -48,5 +49,6 @@ urlpatterns = [
     path("conductores/", ConductoresListView.as_view(), name="conductores-list"),
    path("reservas/", ReservaListView.as_view(), name="reserva-list"),
    path("tenistas/", TenistaListView.as_view(), name="tenista-list"),
+   path('auth/conductor/login/', login_conductor),
 ]
 

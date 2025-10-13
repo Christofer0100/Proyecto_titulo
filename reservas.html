@@ -119,7 +119,7 @@
     </div>
 
   <script>
-    const API_BASE = "https://upgrade-fruits-completed-orchestra.trycloudflare.com/api";  // cámbialo a tu endpoint
+    const API_BASE = "https://alarm-retained-behaviour-advisor.trycloudflare.com/api";  // cámbialo a tu endpoint
     const TOKEN = localStorage.getItem("coord_token") || "";
 
     async function fetchJSON(url, opts = {}) {
@@ -148,15 +148,15 @@
           return;
         }
 
-        const rows = reservas.map(r => `
-          <tr>
-            <td>${r.id}</td>
-            <td>${r.solicitud}</td>
-            <td>${r.conductor ?? ""}</td>
-            <td>${fmtDate(r.fecha_hora_agendada)}</td>
-            <td>${r.estado}</td>
-          </tr>
-        `).join("");
+       const rows = reservas.map(r => `
+  <tr>
+    <td>${r.id}</td>
+    <td>${r.solicitud?.origen?.salida || '-'} → ${r.solicitud?.destino?.lugar || '-'}</td>
+    <td>${r.conductor?.nombre || '-'} ${r.conductor?.apellido || ''}</td>
+    <td>${fmtDate(r.fecha_hora_agendada)}</td>
+    <td>${r.estado}</td>
+  </tr>
+`).join('');
 
         document.querySelector("#tbody-reservas").innerHTML = rows;
       } catch (e) {

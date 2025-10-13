@@ -34,6 +34,8 @@ class Coordinador(models.Model):
     def __str__(self):
         return f"{self.nombre} <{self.correo}>"
 
+
+
 class Conductor(models.Model):
     id         = models.BigAutoField(primary_key=True)
     nombre     = models.TextField()
@@ -41,6 +43,7 @@ class Conductor(models.Model):
     patente    = models.TextField(blank=True, null=True)
     mail       = models.TextField(unique=True)
     telefono   = models.TextField(blank=True, null=True)
+    password_hash = models.CharField(max_length=128, default="")
     activo     = models.BooleanField(default=True)
     created_at = models.DateTimeField(default=timezone.now)
 

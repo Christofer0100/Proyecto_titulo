@@ -1,22 +1,20 @@
-# app/admin.py
-from django.contrib import admin
-from .models import Tenista, Origen, Destino, Solicitud, Reserva, Coordinador, Conductor
 from django.contrib import admin
 from django import forms
 from django.contrib.auth.hashers import make_password
-from .models import Coordinador
-from django.contrib import admin
-from app.models import CoordinadorToken
+from .models import (
+    Tenista, Origen, Destino, Solicitud, Reserva,
+    Coordinador, Conductor, CoordinadorToken
+)
 
+# --- Modelos básicos ---
 admin.site.register(Tenista)
 admin.site.register(Origen)
 admin.site.register(Destino)
 admin.site.register(Solicitud)
 admin.site.register(Reserva)
-admin.site.register(Conductor)
 
+# --- Coordinador ---
 class CoordinadorAdminForm(forms.ModelForm):
-    # Campo para escribir la clave en el admin
     password = forms.CharField(
         label="Password",
         required=False,
@@ -37,14 +35,26 @@ class CoordinadorAdminForm(forms.ModelForm):
             obj.save()
         return obj
 
+
 @admin.register(Coordinador)
 class CoordinadorAdmin(admin.ModelAdmin):
     form = CoordinadorAdminForm
     list_display = ("nombre", "correo")
-    # Si quieres ocultar password_hash del formulario:
-    # exclude = ("password_hash",)
 
 
+@admin.register(CoordinadorToken)
 class CoordinadorTokenAdmin(admin.ModelAdmin):
     list_display = ("id", "coordinador", "key", "is_active", "expires_at", "created_at")
     search_fields = ("coordinador__correo", "key")
+
+
+# --- Conductor ---
+@admin.register(Conductor)
+class ConductorAdmin(admin.ModelAdmin):
+    list_display = ("nombre", "apellido", "mail", "activo")
+
+    def save_model(self, request, obj, form, change):
+        raw_password = form.cleaned_data.get("password_hash")
+        if raw_password and not str(raw_password).startswith("pbkdf2_"):
+            obj.password_hash = make_password(raw_password)
+        super().save_model(request, obj, form, change)

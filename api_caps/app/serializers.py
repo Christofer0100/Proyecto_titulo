@@ -19,10 +19,16 @@ class SolicitudSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class ReservaSerializer(serializers.ModelSerializer):
+    solicitud_origen = serializers.CharField(
+        source='solicitud.origen.salida', read_only=True, allow_null=True
+    )
+    solicitud_destino = serializers.CharField(
+        source='solicitud.destino.lugar', read_only=True, allow_null=True
+    )
     class Meta:
         model = Reserva
         fields = "__all__"
-
+    
 
 class ConductorSerializer(serializers.ModelSerializer):
     class Meta:
@@ -38,13 +44,13 @@ class TenistaSerializer(serializers.ModelSerializer):
 class OrigenSerializer(serializers.ModelSerializer):
     class Meta:
         model = Origen
-        fields = "__all__"
+        fields = ['id', 'salida']
 
 
 class DestinoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Destino
-        fields = "__all__"
+        fields = ['id', 'lugar']
 
 
 # --- Solicitud ---
@@ -88,13 +94,14 @@ class SolicitudWriteSerializer(serializers.ModelSerializer):
 
 class ReservaReadNestedSerializer(serializers.ModelSerializer):
     solicitud = SolicitudReadNestedSerializer(read_only=True)
-    coordinador = CoordinadorSerializer(read_only=True)
     conductor = ConductorSerializer(read_only=True)
+
+    solicitud_origen = serializers.CharField(source='solicitud.origen.salida', read_only=True, allow_null=True)
+    solicitud_destino = serializers.CharField(source='solicitud.destino.lugar', read_only=True, allow_null=True)
 
     class Meta:
         model = Reserva
         fields = "__all__"
-
 
 class ReservaWriteSerializer(serializers.ModelSerializer):
     solicitud_id = serializers.PrimaryKeyRelatedField(
@@ -141,3 +148,19 @@ class ConductorListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Conductor
         fields = ["id", "nombre", "apellido", "patente", "mail", "telefono", "activo", "created_at"]
+
+
+class SolicitudMiniSerializer(serializers.ModelSerializer):
+    origen = OrigenSerializer()
+    destino = DestinoSerializer()
+
+    class Meta:
+        model = Solicitud
+        fields = ['id', 'hora_salida', 'origen', 'destino', 'estado']
+
+class ReservaSerializer(serializers.ModelSerializer):
+    solicitud = SolicitudMiniSerializer()
+    
+    class Meta:
+        model = Reserva
+        fields = '__all__'

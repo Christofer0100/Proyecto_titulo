@@ -44,10 +44,12 @@ from django.db.models import Q
 from rest_framework.generics import ListAPIView
 
 from app.models import Conductor, Solicitud, Reserva, ReservaEstado
-from app.serializers import ConductorSerializer, ReservaSerializer
+from app.serializers import ConductorSerializer, ReservaReadNestedSerializer, ReservaWriteSerializer
 
-
-
+from django.http import JsonResponse
+from django.contrib.auth.hashers import check_password
+from .models import Conductor
+import json
 
 
 class BaseViewSet(viewsets.ModelViewSet):
@@ -97,21 +99,26 @@ class SolicitudViewSet(BaseViewSet):
     ordering_fields = ["id", "created_at"]
 
     def get_serializer_class(self):
-        if self.action in ["list", "retrieve"]:
+        if getattr(self, "action", None) in ["list", "retrieve"]:
             return SolicitudReadNestedSerializer
         return SolicitudWriteSerializer
 
-
 class ReservaViewSet(BaseViewSet):
-    queryset = Reserva.objects.select_related("solicitud", "coordinador", "conductor").order_by("-id")
-    search_fields = ["estado", "conductor__nombre", "conductor__apellido", "solicitud__form_telefono"]
+    queryset = Reserva.objects.select_related("solicitud", "conductor", "coordinador").order_by("-id")
+    search_fields = ["estado", "conductor__nombre", "solicitud__id"]
     ordering_fields = ["id", "fecha_hora_agendada", "created_at", "updated_at"]
 
     def get_serializer_class(self):
-        if self.action in ["list", "retrieve"]:
+        if getattr(self, "action", None) in ["list", "retrieve"]:
             return ReservaReadNestedSerializer
         return ReservaWriteSerializer
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        conductor_id = self.request.query_params.get("conductor")
+        if conductor_id:
+            queryset = queryset.filter(conductor_id=conductor_id)
+        return queryset 
 
 class SolicitudListAPI(generics.ListAPIView):
     queryset = Solicitud.objects.select_related("tenista", "origen", "destino").order_by("-created_at", "-id")
@@ -283,15 +290,46 @@ def asignar_conductor_a_solicitud(request, pk: int):
     return Response({
         "ok": True,
         "solicitud_id": sol.id,
-        "reserva": ReservaSerializer(reserva).data
+        "reserva": ReservaReadNestedSerializer(reserva).data
     }, status=200)
 
 
 class ReservaListView(generics.ListAPIView):
     queryset = Reserva.objects.all().order_by('-fecha_hora_agendada')
-    serializer_class = ReservaSerializer
+    serializer_class = ReservaReadNestedSerializer
 
 
 class TenistaListView(generics.ListAPIView):
     queryset = Tenista.objects.all().order_by("id")
     serializer_class = TenistaSerializer
+
+
+
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+def login_conductor(request):
+    if request.method != "POST":
+        return JsonResponse({"ok": False, "error": "Método no permitido"}, status=405)
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+        email = data.get("email")
+        password = data.get("password")
+
+        conductor = Conductor.objects.get(mail=email)
+        if not check_password(password, conductor.password_hash):
+            return JsonResponse({"ok": False, "error": "Credenciales inválidas"}, status=401)
+
+        return JsonResponse({
+            "ok": True,
+            "conductor": {
+                "id": conductor.id,
+                "nombre": conductor.nombre,
+                "apellido": conductor.apellido,
+                "mail": conductor.mail
+            }
+        })
+    except Conductor.DoesNotExist:
+        return JsonResponse({"ok": False, "error": "Conductor no encontrado"}, status=404)
+    except Exception as e:
+        return JsonResponse({"ok": False, "error": str(e)}, status=500)
