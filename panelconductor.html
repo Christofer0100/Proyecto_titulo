@@ -7,31 +7,104 @@
   <link rel="stylesheet" href="css/cdr.css">
 </head>
 <body>
+
   <div class="container">
+
     <aside>
-      <div class="logo"><h2>ATP <span class="primary">Conductor</span></h2></div>
-      <div class="sidebar">
-        <a href="#" class="active"><span class="material-icons-sharp">directions_car</span><h3>Mis viajes</h3></a>
-        <a href="loginconductor.html" onclick="cerrarSesion()"><span class="material-icons-sharp">logout</span><h3>Salir</h3></a>
-      </div>
+            <div class="toggle">
+                <div class="logo">
+                    <img src="imagenes/3.jpg">
+                    <h2><span class="primary">ATP</span></h2>
+                </div>
+                <div class="close" id="close-btn">
+                    <span class="material-icons-sharp">
+                        close
+                    </span>
+                </div>
+            </div>
+
+            <div class="sidebar">
+
+                <a href="#">
+                    <span class="material-icons-sharp">
+                        person_outline
+                    </span>
+                    <h3>Extra</h3>
+                </a>
+                <a href="#" class="active">
+                    <span class="material-icons-sharp">
+                      directions_car
+                    </span>
+                       
+                    <h3>Mis Viajes</h3>
+                </a>
+
+                <a href="loginconductor.html" onclick="cerrarSesion()">
+                  <span class="material-icons-sharp">
+                    logout
+                  </span>
+                  <h3>Cerrar Sesión</h3>
+                </a>
+
+            </div>
     </aside>
 
-    <main>
-      <h1>Mis viajes</h1>
-      <table class="table">
-        <thead>
-          <tr><th>ID</th><th>Origen</th><th>Destino</th><th>Fecha</th><th>Estado</th><th>Acción</th></tr>
-        </thead>
-        <tbody id="tbody-viajes">
-          <tr><td colspan="6" style="text-align:center;">Cargando viajes...</td></tr>
-        </tbody>
-      </table>
-    </main>
-  </div>
+        <main>
+            <h1>Mis Viajes</h1>
+            <div class="recent-orders">
+                <div class="card">
+                    <div class="table-wrap">
+                      <table class="table">
+                        <thead>
+                          <tr>
+                            <th>ID</th>
+                            <th>Origen</th>
+                            <th>Destino</th>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                            <th>Acción</th>
+                          </tr>
+                        </thead>
+                        <tbody id="tbody-viajes">
+                          <tr><td colspan="6" style="text-align:center;">Cargando viajes...</td></tr>
+                        </tbody>
+                      </table>
+                    </div>
+                </div>
+            </div>
+          
+
+        </main>
+
+        <div class="right-section">
+            <div class="nav">
+                <button id="menu-btn">
+                    <span class="material-icons-sharp">
+                        menu
+                    </span>
+                </button>
+                <div class="dark-mode">
+                    <span class="material-icons-sharp active">
+                        light_mode
+                    </span>
+                    <span class="material-icons-sharp">
+                        dark_mode
+                    </span>
+                </div>
+
+                <div class="profile">
+                    <div class="info">
+                        <p>Hola, <b>Conductor</b></p>
+                        <small class="text-muted">¡Buen Viaje!</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 <script>
 // 🔹 URL base de tu API (ajústala si usas otro túnel o dominio)
-const API_BASE = "https://alarm-retained-behaviour-advisor.trycloudflare.com/api";
+const API_BASE = "https://accommodate-offering-switches-theatre.trycloudflare.com/api";
 
 // 🔹 Obtener datos del conductor desde el login (guardado en localStorage)
 const conductorData = JSON.parse(localStorage.getItem("conductor"));
@@ -107,5 +180,6 @@ function cerrarSesion() {
 // 🔹 Ejecutar carga al iniciar
 cargarViajes();
 </script>
+<script src="/js/coordinador.js"></script>
 </body>
 </html>
