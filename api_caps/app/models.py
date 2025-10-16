@@ -167,9 +167,11 @@ class Reserva(models.Model):
         related_name="reservas",
     )
     conductor   = models.ForeignKey(
-        Conductor, models.DO_NOTHING,
-        db_column="conductor_id", blank=True, null=True,
-        related_name="reservas",
+    Conductor,
+    models.DO_NOTHING,
+    blank=True,
+    null=True,
+    related_name="reservas",
     )
 
     fecha_hora_agendada = models.DateTimeField()

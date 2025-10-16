@@ -33,7 +33,7 @@ class ReservaSerializer(serializers.ModelSerializer):
 class ConductorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Conductor
-        fields = ["id", "nombre", "apellido", "telefono", "mail", "activo"]
+        fields = ["id", "nombre", "apellido", "patente","telefono", "mail", "activo"]
 
 class TenistaSerializer(serializers.ModelSerializer):
     class Meta:

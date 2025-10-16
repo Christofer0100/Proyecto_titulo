@@ -103,9 +103,18 @@ class SolicitudViewSet(BaseViewSet):
             return SolicitudReadNestedSerializer
         return SolicitudWriteSerializer
 
-class ReservaViewSet(BaseViewSet):
-    queryset = Reserva.objects.select_related("solicitud", "conductor", "coordinador").order_by("-id")
-    search_fields = ["estado", "conductor__nombre", "solicitud__id"]
+# ✅ VERSIÓN FINAL DE ReservaViewSet
+from rest_framework import viewsets
+from .models import Reserva
+from .serializers import ReservaReadNestedSerializer, ReservaWriteSerializer
+
+class ReservaViewSet(viewsets.ModelViewSet):
+    """
+    Vista para listar y gestionar reservas.
+    Filtra automáticamente por conductor si se pasa ?conductor=ID en la URL.
+    """
+    queryset = Reserva.objects.select_related("solicitud", "coordinador", "conductor").order_by("-id")
+    search_fields = ["estado", "conductor__nombre", "conductor__apellido", "solicitud__form__telefono"]
     ordering_fields = ["id", "fecha_hora_agendada", "created_at", "updated_at"]
 
     def get_serializer_class(self):
@@ -115,10 +124,18 @@ class ReservaViewSet(BaseViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        conductor_id = self.request.query_params.get("conductor")
+        conductor_id = self.request.query_params.get("conductor", None)
+        print("🟢 conductor_id recibido:", conductor_id)  # Debug visible en consola
+
+        # 🔹 Si se pasa un ID de conductor, filtra
         if conductor_id:
-            queryset = queryset.filter(conductor_id=conductor_id)
-        return queryset 
+            queryset = queryset.filter(conductor__id=conductor_id)
+            print("🟢 Query con filtro aplicado:", queryset.query)
+        else:
+            print("⚠️ No se recibió parámetro 'conductor'")
+
+        return queryset
+
 
 class SolicitudListAPI(generics.ListAPIView):
     queryset = Solicitud.objects.select_related("tenista", "origen", "destino").order_by("-created_at", "-id")

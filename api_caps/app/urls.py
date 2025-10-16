@@ -37,7 +37,7 @@ router.register(r'reservas',   ReservaViewSet,   basename='reserva')
 
 
 urlpatterns = [
-    path('api/', include(router.urls)),
+    path('', include(router.urls)),
     path("webhooks/whatsapp/", whatsapp_webhook, name="whatsapp_webhook"),
     path("solicitudes/<int:pk>/", solicitud_detail),
     path("api/tenistas/por-numero/", tenista_por_numero), 
