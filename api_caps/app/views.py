@@ -1,57 +1,32 @@
-from django.shortcuts import render
-# Create your views here.
-from rest_framework import generics, permissions
-from .models import Solicitud, Conductor
-from .serializers import SolicitudListSerializer, ConductorListSerializer
-from rest_framework import viewsets, filters
+# app/views.py
+from django.http import JsonResponse
+from django.utils import timezone
+from django.db import transaction
+from django.db.models import Q
+from rest_framework import viewsets, generics, filters, permissions, status
+from rest_framework.decorators import api_view, permission_classes
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+import logging
+import json
+
 from .models import (
-    Coordinador, Conductor, Tenista, Origen, Destino,
-    Solicitud, Reserva
+    Coordinador, CoordinadorToken, Conductor, Tenista, Origen, Destino,
+    Solicitud, Reserva, ReservaEstado
 )
 from .serializers import (
     CoordinadorSerializer, ConductorSerializer, TenistaSerializer,
     OrigenSerializer, DestinoSerializer,
     SolicitudReadNestedSerializer, SolicitudWriteSerializer,
-    ReservaReadNestedSerializer, ReservaWriteSerializer
+    ReservaReadNestedSerializer, ReservaWriteSerializer,
+    SolicitudListSerializer, ConductorListSerializer,
 )
-from app.models import Coordinador, CoordinadorToken, Solicitud, Tenista, Origen, Destino
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
-from rest_framework.response import Response
-from rest_framework import status
-from django.contrib.auth.hashers import check_password, make_password
-from django.utils import timezone
-from django.db import models
-import secrets
-from datetime import timedelta
 
-from .models import Coordinador
-# app/views.py
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
-from rest_framework.response import Response
-from rest_framework import status
-from django.utils import timezone
-from django.contrib.auth.hashers import check_password
-import logging
-
-from app.models import Coordinador, CoordinadorToken
-from datetime import timedelta
-from django.db import transaction
-from django.utils import timezone
-from django.db.models import Q
-from rest_framework.generics import ListAPIView
-
-from app.models import Conductor, Solicitud, Reserva, ReservaEstado
-from app.serializers import ConductorSerializer, ReservaReadNestedSerializer, ReservaWriteSerializer
-
-from django.http import JsonResponse
-from django.contrib.auth.hashers import check_password
-from .models import Conductor
-import json
+logger = logging.getLogger(__name__)
 
 
+# ---------- Base ----------
 class BaseViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
@@ -59,6 +34,7 @@ class BaseViewSet(viewsets.ModelViewSet):
     search_fields = ["id"]
 
 
+# ---------- Catálogos ----------
 class CoordinadorViewSet(BaseViewSet):
     queryset = Coordinador.objects.all().order_by("-id")
     serializer_class = CoordinadorSerializer
@@ -67,10 +43,26 @@ class CoordinadorViewSet(BaseViewSet):
 
 
 class ConductorViewSet(BaseViewSet):
+    """
+    GET /api/conductores/?disponibles=1  -> excluye conductores ocupados (ASIGNADA, EN_CURSO)
+    """
     queryset = Conductor.objects.all().order_by("-id")
     serializer_class = ConductorSerializer
     search_fields = ["nombre", "apellido", "mail", "telefono", "patente"]
     ordering_fields = ["id", "created_at"]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        # Si quieres solo activos por defecto, descomenta:
+        # qs = qs.filter(activo=True)
+
+        disponibles = self.request.query_params.get("disponibles")
+        if str(disponibles) == "1":
+            ocupados_ids = (Reserva.objects
+                            .filter(estado__in=[ReservaEstado.ASIGNADA, ReservaEstado.EN_CURSO])
+                            .values_list("conductor_id", flat=True))
+            qs = qs.exclude(id__in=ocupados_ids)
+        return qs
 
 
 class TenistaViewSet(BaseViewSet):
@@ -93,6 +85,7 @@ class DestinoViewSet(BaseViewSet):
     ordering_fields = ["id"]
 
 
+# ---------- Solicitudes ----------
 class SolicitudViewSet(BaseViewSet):
     queryset = Solicitud.objects.select_related("origen", "destino", "tenista").order_by("-id")
     search_fields = ["form_telefono", "form_correo", "form_nombres", "form_apellidos", "estado"]
@@ -103,15 +96,14 @@ class SolicitudViewSet(BaseViewSet):
             return SolicitudReadNestedSerializer
         return SolicitudWriteSerializer
 
-# ✅ VERSIÓN FINAL DE ReservaViewSet
-from rest_framework import viewsets
-from .models import Reserva
-from .serializers import ReservaReadNestedSerializer, ReservaWriteSerializer
 
+# ---------- Reservas ----------
 class ReservaViewSet(viewsets.ModelViewSet):
     """
-    Vista para listar y gestionar reservas.
-    Filtra automáticamente por conductor si se pasa ?conductor=ID en la URL.
+    Soporta filtros por:
+      - ?conductor=<ID>
+      - ?solicitud=<ID>  (o ?solicitud_id=<ID>)
+      - ?estado=ASIGNADA|EN_CURSO|...
     """
     queryset = Reserva.objects.select_related("solicitud", "coordinador", "conductor").order_by("-id")
     search_fields = ["estado", "conductor__nombre", "conductor__apellido", "solicitud__form__telefono"]
@@ -123,24 +115,29 @@ class ReservaViewSet(viewsets.ModelViewSet):
         return ReservaWriteSerializer
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        conductor_id = self.request.query_params.get("conductor", None)
-        print("🟢 conductor_id recibido:", conductor_id)  # Debug visible en consola
+        qs = super().get_queryset()
 
-        # 🔹 Si se pasa un ID de conductor, filtra
+        conductor_id = self.request.query_params.get("conductor")
         if conductor_id:
-            queryset = queryset.filter(conductor__id=conductor_id)
-            print("🟢 Query con filtro aplicado:", queryset.query)
-        else:
-            print("⚠️ No se recibió parámetro 'conductor'")
+            qs = qs.filter(conductor__id=conductor_id)
 
-        return queryset
+        sid = self.request.query_params.get("solicitud_id") or self.request.query_params.get("solicitud")
+        if sid:
+            qs = qs.filter(solicitud_id=sid)
+
+        estado = self.request.query_params.get("estado")
+        if estado:
+            qs = qs.filter(estado=estado)
+
+        return qs
 
 
+# ---------- List APIs (si las usas en UI) ----------
 class SolicitudListAPI(generics.ListAPIView):
     queryset = Solicitud.objects.select_related("tenista", "origen", "destino").order_by("-created_at", "-id")
     serializer_class = SolicitudListSerializer
-    permission_classes = [permissions.AllowAny]  # o cambia a IsAuthenticated
+    permission_classes = [permissions.AllowAny]
+
 
 class ConductorListAPI(generics.ListAPIView):
     queryset = Conductor.objects.all().order_by("-id")
@@ -148,13 +145,12 @@ class ConductorListAPI(generics.ListAPIView):
     permission_classes = [permissions.AllowAny]
 
 
-logger = logging.getLogger(__name__)
+# ---------- Auth / Tokens ----------
+def _emit_token(coord: Coordinador) -> CoordinadorToken:
+    CoordinadorToken.objects.filter(
+        coordinador=coord, is_active=True, expires_at__lt=timezone.now()
+    ).update(is_active=False)
 
-def _emit_token(coord):
-    # elimina tokens viejos si quieres, o reusa el más reciente válido
-    CoordinadorToken.objects.filter(coordinador=coord, is_active=True, expires_at__lt=timezone.now()).update(is_active=False)
-
-    # crea token nuevo
     from secrets import token_urlsafe
     key = token_urlsafe(32)
     t = CoordinadorToken.objects.create(
@@ -165,6 +161,7 @@ def _emit_token(coord):
     )
     return t
 
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def coordinador_login(request):
@@ -173,73 +170,32 @@ def coordinador_login(request):
         password = request.data.get('password') or ''
 
         if not email or not password:
-            return Response(
-                {"ok": False, "error": "email y password son requeridos"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return Response({"ok": False, "error": "email y password son requeridos"}, status=400)
 
         coord = Coordinador.objects.filter(correo__iexact=email).first()
-        if not coord:
-            return Response(
-                {"ok": False, "error": "Coordinador no encontrado"},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
+        if not coord or not coord.password_hash:
+            return Response({"ok": False, "error": "Credenciales inválidas"}, status=401)
 
-        if not coord.password_hash:
-            return Response(
-                {"ok": False, "error": "El coordinador no tiene contraseña definida"},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-
+        from django.contrib.auth.hashers import check_password
         if not check_password(password, coord.password_hash):
-            return Response(
-                {"ok": False, "error": "Credenciales inválidas"},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
+            return Response({"ok": False, "error": "Credenciales inválidas"}, status=401)
 
         token = _emit_token(coord)
-        return Response(
-            {
-                "ok": True,
-                "token": token.key,
-                "expires_at": token.expires_at.isoformat(),
-                "coordinador": {
-                    "id": coord.id,
-                    "correo": coord.correo,
-                    "nombre": getattr(coord, "nombre", None),
-                },
-            },
-            status=status.HTTP_200_OK,
-        )
+        return Response({
+            "ok": True,
+            "token": token.key,
+            "expires_at": token.expires_at.isoformat(),
+            "coordinador": {"id": coord.id, "correo": coord.correo, "nombre": getattr(coord, "nombre", None)},
+        })
 
-    except Exception as e:
+    except Exception:
         logger.exception("Error en login de coordinador")
-        return Response(
-            {"ok": False, "error": "Error interno"},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
-    
-##############################################################################################################
-class ConductoresListView(ListAPIView):
-    serializer_class = ConductorSerializer
-    permission_classes = [AllowAny]  # cámbialo según tu auth
-
-    def get_queryset(self):
-        qs = Conductor.objects.filter(activo=True)
-
-        # ?disponibles=1 -> excluir conductores ocupados (ASIGNADA o EN_CURSO)
-        disponibles = self.request.query_params.get("disponibles")
-        if str(disponibles) == "1":
-            ocupados_ids = (Reserva.objects
-                            .filter(estado__in=[ReservaEstado.ASIGNADA, ReservaEstado.EN_CURSO])
-                            .values_list("conductor_id", flat=True))
-            qs = qs.exclude(id__in=ocupados_ids)
-        return qs
+        return Response({"ok": False, "error": "Error interno"}, status=500)
 
 
-# --- 2) Asignar conductor a una solicitud
+# ---------- Asignación de conductor ----------
 @api_view(["POST"])
-@permission_classes([AllowAny])  # cámbialo si usas auth
+@permission_classes([AllowAny])  # ajusta si usas auth
 @transaction.atomic
 def asignar_conductor_a_solicitud(request, pk: int):
     """
@@ -265,18 +221,14 @@ def asignar_conductor_a_solicitud(request, pk: int):
     except Conductor.DoesNotExist:
         return Response({"ok": False, "error": "Conductor no válido o inactivo"}, status=400)
 
-    # Evitar doble asignación a un conductor ocupado
-    ocupado = Reserva.objects.filter(
+    # Evitar doble asignación
+    if Reserva.objects.filter(
         conductor_id=conductor.id,
         estado__in=[ReservaEstado.ASIGNADA, ReservaEstado.EN_CURSO]
-    ).exists()
-    if ocupado:
+    ).exists():
         return Response({"ok": False, "error": "El conductor ya está asignado"}, status=409)
 
-    # Crear o actualizar la reserva de esta solicitud
-    fecha = data.get("fecha_hora_agendada")
-    if not fecha:
-        fecha = timezone.now().isoformat()
+    fecha = data.get("fecha_hora_agendada") or timezone.now().isoformat()
 
     reserva, _created = Reserva.objects.get_or_create(
         solicitud=sol,
@@ -287,42 +239,25 @@ def asignar_conductor_a_solicitud(request, pk: int):
             "updated_at": timezone.now(),
         },
     )
-    # Si ya existía, actualizamos
     reserva.conductor = conductor
     reserva.estado = ReservaEstado.ASIGNADA
     reserva.fecha_hora_agendada = fecha
     reserva.updated_at = timezone.now()
 
-    # (opcional) coordinador que asigna
     coord_id = data.get("coordinador_id")
     if coord_id:
-        from app.models import Coordinador
-        try:
-            reserva.coordinador_id = int(coord_id)
-        except Exception:
-            pass
+        reserva.coordinador_id = int(coord_id)
 
     reserva.save()
 
-    return Response({
-        "ok": True,
-        "solicitud_id": sol.id,
-        "reserva": ReservaReadNestedSerializer(reserva).data
-    }, status=200)
+    return Response({"ok": True, "solicitud_id": sol.id, "reserva": ReservaReadNestedSerializer(reserva).data})
 
 
-class ReservaListView(generics.ListAPIView):
-    queryset = Reserva.objects.all().order_by('-fecha_hora_agendada')
-    serializer_class = ReservaReadNestedSerializer
-
-
+# ---------- Tenistas & Login conductor (custom) ----------
 class TenistaListView(generics.ListAPIView):
     queryset = Tenista.objects.all().order_by("id")
     serializer_class = TenistaSerializer
 
-
-
-from django.views.decorators.csrf import csrf_exempt
 
 @csrf_exempt
 def login_conductor(request):
@@ -333,6 +268,7 @@ def login_conductor(request):
         email = data.get("email")
         password = data.get("password")
 
+        from django.contrib.auth.hashers import check_password
         conductor = Conductor.objects.get(mail=email)
         if not check_password(password, conductor.password_hash):
             return JsonResponse({"ok": False, "error": "Credenciales inválidas"}, status=401)
