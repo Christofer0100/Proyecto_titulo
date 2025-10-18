@@ -2,173 +2,220 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <title>Solicitudes - Asignación de Conductor</title>
+  <title>Reservas</title>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="css/reserva.css">
 </head>
 
-
 <body>
-
   <div class="container">
-
     <aside>
-            <div class="toggle">
-                <div class="logo">
-                    <img src="imagenes/3.jpg">
-                    <h2><span class="primary">ATP</span></h2>
-                </div>
-                <div class="close" id="close-btn">
-                    <span class="material-icons-sharp">
-                        close
-                    </span>
-                </div>
-            </div>
+      <div class="toggle">
+        <div class="logo">
+          <img src="imagenes/3.jpg" alt="">
+          <h2><span class="primary">ATP</span></h2>
+        </div>
+        <div class="close" id="close-btn">
+          <span class="material-icons-sharp">close</span>
+        </div>
+      </div>
 
-            <div class="sidebar">
-                <a href="/Api_Modelo_Predictivo/frontend/modelo.html">
-                    <span class="material-icons-sharp">
-                        dashboard
-                    </span>
-                    <h3>Predicción</h3>
-                </a>
-                <a href="/tenistas.html">
-                    <span class="material-icons-sharp">
-                        person_outline
-                    </span>
-                    <h3>Tenista</h3>
-                </a>
-                <a href="/conductor.html" >
-                    <span class="material-icons-sharp">
-                        person_outline
-                    </span>
-                    <h3>Conductores</h3>
-                </a>
-                <a href="/prueba2.html" class="">
-                    <span class="material-icons-sharp">
-                        insights
-                    </span>
-                    <h3>Solicitudes</h3>
-                </a>
-                <a href="/reservas.html" class="active">
-                    <span class="material-icons-sharp">
-                        receipt_long
-                    </span>
-                    <h3>Reservas</h3>
-                </a>
-                <a href="/inicio_sesion.html">
-                    <span class="material-icons-sharp">
-                        logout
-                    </span>
-                    <h3>Cerrar Sesión</h3>
-                </a>
-            </div>
+      <div class="sidebar">
+        <a href="/Api_Modelo_Predictivo/frontend/modelo.html">
+          <span class="material-icons-sharp">dashboard</span><h3>Predicción</h3>
+        </a>
+        <a href="/tenistas.html">
+          <span class="material-icons-sharp">person_outline</span><h3>Tenista</h3>
+        </a>
+        <a href="/conductor.html">
+          <span class="material-icons-sharp">person_outline</span><h3>Conductores</h3>
+        </a>
+        <a href="/prueba2.html">
+          <span class="material-icons-sharp">insights</span><h3>Solicitudes</h3>
+        </a>
+        <a href="/reservas.html" class="active">
+          <span class="material-icons-sharp">receipt_long</span><h3>Reservas</h3>
+        </a>
+        <a href="/inicio_sesion.html">
+          <span class="material-icons-sharp">logout</span><h3>Cerrar Sesión</h3>
+        </a>
+      </div>
     </aside>
 
-        <main>
-            <h1>Reservas</h1>
-            <div class="recent-orders">
-                <div class="card">
-                    <div class="table-wrap">
-                      <table id="tbl-reservas">
-                            <thead>
-                            <tr>
-                                <th>Id</th>
-                                <th>Solicitud</th>
-                                <th>Conductor</th>
-                                <th>Fecha agendada</th>
-                                <th>Estado</th>
-                            </tr>
-                            </thead>
-                            <tbody id="tbody-reservas">
-                            <tr><td colspan="6" style="text-align:center;">Cargando...</td></tr>
-                             </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-          
+    <main>
+      <h1>Reservas</h1>
 
-        </main>
-
-        <div class="right-section">
-            <div class="nav">
-                <button id="menu-btn">
-                    <span class="material-icons-sharp">
-                        menu
-                    </span>
-                </button>
-                <div class="dark-mode">
-                    <span class="material-icons-sharp active">
-                        light_mode
-                    </span>
-                    <span class="material-icons-sharp">
-                        dark_mode
-                    </span>
-                </div>
-
-                <div class="profile">
-                    <div class="info">
-                        <p>Hola, <b>Helena</b></p>
-                        <small class="text-muted">Coordinador</small>
-                    </div>
-                </div>
-            </div>
+      <div class="recent-orders">
+        <div class="card">
+          <div class="table-wrap">
+            <table id="tbl-reservas" aria-label="Tabla de reservas">
+              <thead>
+                <tr>
+                  <th>Id</th>
+                  <th>Solicitud</th>
+                  <th>Conductor</th>
+                  <th>Fecha agendada</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-reservas">
+                <tr><td colspan="5" style="text-align:center;">Cargando…</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
+      </div>
+    </main>
+
+    <div class="right-section">
+      <div class="nav">
+        <button id="menu-btn"><span class="material-icons-sharp">menu</span></button>
+        <div class="dark-mode">
+          <span class="material-icons-sharp active">light_mode</span>
+          <span class="material-icons-sharp">dark_mode</span>
+        </div>
+        <div class="profile">
+          <div class="info">
+            <p>Hola, <b id="coordinadorNombre">—</b></p>
+            <small class="text-muted">Coordinador</small>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 
   <script>
-    const API_BASE = "https://query-uniprotkb-few-isolation.trycloudflare.com/api";  // cámbialo a tu endpoint
-    const TOKEN = localStorage.getItem("coord_token") || "";
+    /* ====== CONFIG ====== */
+    const API_BASE = 'https://reflected-slim-seen-volvo.trycloudflare.com/api'; // mismo que en Solicitudes
+    const TOKEN = localStorage.getItem('coord_token') || '';
 
-    async function fetchJSON(url, opts = {}) {
-      const headers = {
-        "Accept": "application/json",
-        ...(opts.method ? { "Content-Type": "application/json" } : {}),
-        ...(TOKEN ? { "Authorization": "Bearer " + TOKEN } : {})
-      };
-      const r = await fetch(url, { ...opts, headers });
-      if (!r.ok) throw new Error("Error HTTP " + r.status);
+    /* ====== HELPERS ====== */
+    function headersJSON() {
+      const h = { 'Accept': 'application/json' };
+      if (TOKEN) h['Authorization'] = 'Token ' + TOKEN; // nuestro backend usa "Token <clave>"
+      return h;
+    }
+
+    async function fetchJSON(url) {
+      const r = await fetch(url, { headers: headersJSON() });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
       return r.json();
     }
 
+    // Soporte a paginación estilo DRF (results/next) o array plano
+    async function fetchAll(url) {
+      const out = [];
+      let next = url;
+      while (next) {
+        const data = await fetchJSON(next);
+        if (Array.isArray(data)) { out.push(...data); break; }
+        if (Array.isArray(data.results)) out.push(...data.results);
+        next = data.next || null;
+      }
+      return out;
+    }
+
     function fmtDate(d) {
-      return d ? new Date(d).toLocaleString() : "";
+      if (!d) return '';
+      try {
+        return new Date(d).toLocaleString('es-CL', { dateStyle: 'medium', timeStyle: 'short' });
+      } catch { return d; }
+    }
+
+    function safeTxt(v, def='-') {
+      return (v===null || v===undefined || v==='') ? def : v;
+    }
+
+    function renderReservas(rows) {
+      const $tbody = document.getElementById('tbody-reservas');
+      if (!rows.length) {
+        $tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No hay reservas</td></tr>`;
+        return;
+      }
+
+      const html = rows.map(r => {
+        const origen  = r.solicitud?.origen?.salida ?? r.origen?.salida ?? r.origen ?? '-';
+        const destino = r.solicitud?.destino?.lugar ?? r.destino?.lugar ?? r.destino ?? '-';
+
+        const cNom = [r.conductor?.nombre, r.conductor?.apellido].filter(Boolean).join(' ');
+        const conductorTxt = cNom || (r.conductor_nombre ?? r.conductor_id ?? '-');
+
+        const estado = (r.estado || '').toString().toUpperCase() || '-';
+        const estadoBadge = `<span class="badge ${estado}">${estado}</span>`;
+
+        return `
+          <tr>
+            <td>${safeTxt(r.id)}</td>
+            <td>${safeTxt(origen)} &rarr; ${safeTxt(destino)}</td>
+            <td>${safeTxt(conductorTxt)}</td>
+            <td>${fmtDate(r.fecha_hora_agendada || r.fecha_hora)}</td>
+            <td>${estadoBadge}</td>
+          </tr>`;
+      }).join('');
+
+      $tbody.innerHTML = html;
     }
 
     async function loadReservas() {
+      const $tbody = document.getElementById('tbody-reservas');
+      $tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Cargando…</td></tr>`;
       try {
-        const data = await fetchJSON(`${API_BASE}/reservas/`);
-        const reservas = data.results || data;
-
-        if (!reservas.length) {
-          document.querySelector("#tbody-reservas").innerHTML =
-            `<tr><td colspan="6" style="text-align:center;">No hay reservas</td></tr>`;
-          return;
-        }
-
-       const rows = reservas.map(r => `
-  <tr>
-    <td>${r.id}</td>
-    <td>${r.solicitud?.origen?.salida || '-'} → ${r.solicitud?.destino?.lugar || '-'}</td>
-    <td>${r.conductor?.nombre || '-'} ${r.conductor?.apellido || ''}</td>
-    <td>${fmtDate(r.fecha_hora_agendada)}</td>
-    <td>${r.estado}</td>
-  </tr>
-`).join('');
-
-        document.querySelector("#tbody-reservas").innerHTML = rows;
+        const reservas = await fetchAll(`${API_BASE}/reservas/`);
+        renderReservas(reservas);
       } catch (e) {
         console.error(e);
-        document.querySelector("#tbody-reservas").innerHTML =
-          `<tr><td colspan="6" style="text-align:center;color:red;">Error cargando reservas</td></tr>`;
+        $tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:red;">Error cargando reservas</td></tr>`;
       }
     }
 
-    // inicia carga al abrir página
-    loadReservas();
+    // ====== Nombre real del coordinador con cache ======
+    function pintarCoordinador(nombre) {
+      const el = document.getElementById('coordinadorNombre');
+      if (nombre && el) el.textContent = nombre;
+    }
+
+    (function pintarDesdeCache() {
+      const cached = localStorage.getItem('coord_name');
+      if (cached) pintarCoordinador(cached); // muestra instantáneo para evitar parpadeo
+    })();
+
+    async function cargarCoordinador(){
+      const candidates = [
+        `${API_BASE}/coordinadores/me/`,
+        `${API_BASE}/coordinadores/?activo=true`,
+        `${API_BASE}/coordinadores/`
+      ];
+      for (const url of candidates) {
+        try {
+          const data = await fetchJSON(url);
+          let item = null;
+          if (Array.isArray(data?.results) && data.results.length) item = data.results[0];
+          else if (Array.isArray(data) && data.length) item = data[0];
+          else if (data && typeof data === 'object') item = data;
+
+          if (item) {
+            const nombre = [item.nombre, item.apellido].filter(Boolean).join(' ')
+                         || item.nombre || item.user || null;
+            if (nombre) {
+              pintarCoordinador(nombre);
+              localStorage.setItem('coord_name', nombre); // cache fresco
+              return;
+            }
+          }
+        } catch (_) {
+          // continuar con el siguiente endpoint
+        }
+      }
+      // Si no hubo éxito, dejamos "—" o el cache previo
+    }
+
+    // Init
+    (async () => {
+      await Promise.all([cargarCoordinador(), loadReservas()]);
+    })();
   </script>
+
   <script src="/js/coordinador.js"></script>
-    </body>
+</body>
 </html>

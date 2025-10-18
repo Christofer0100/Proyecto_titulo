@@ -2,170 +2,202 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <title>Solicitudes - Asignación de Conductor</title>
+  <title>Tenistas</title>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="css/tenista.css">
 </head>
 
-
 <body>
-
   <div class="container">
-
     <aside>
-            <div class="toggle">
-                <div class="logo">
-                    <img src="imagenes/3.jpg">
-                    <h2><span class="primary">ATP</span></h2>
-                </div>
-                <div class="close" id="close-btn">
-                    <span class="material-icons-sharp">
-                        close
-                    </span>
-                </div>
-            </div>
+      <div class="toggle">
+        <div class="logo">
+          <img src="imagenes/3.jpg" alt="">
+          <h2><span class="primary">ATP</span></h2>
+        </div>
+        <div class="close" id="close-btn">
+          <span class="material-icons-sharp">close</span>
+        </div>
+      </div>
 
-            <div class="sidebar">
-                <a href="/Api_Modelo_Predictivo/frontend/modelo.html">
-                    <span class="material-icons-sharp">
-                        dashboard
-                    </span>
-                    <h3>Predicción</h3>
-                </a>
-                <a href="/tenistas.html"  class="active">
-                    <span class="material-icons-sharp">
-                        person_outline
-                    </span>
-                    <h3>Tenista</h3>
-                </a>
-                <a href="/conductor.html" >
-                    <span class="material-icons-sharp">
-                        person_outline
-                    </span>
-                    <h3>Conductores</h3>
-                </a>
-                <a href="/prueba2.html" class="">
-                    <span class="material-icons-sharp">
-                        insights
-                    </span>
-                    <h3>Solicitudes</h3>
-                </a>
-                <a href="/reservas.html" >
-                    <span class="material-icons-sharp">
-                        receipt_long
-                    </span>
-                    <h3>Reservas</h3>
-                </a>
-                <a href="/inicio_sesion.html">
-                    <span class="material-icons-sharp">
-                        logout
-                    </span>
-                    <h3>Cerrar Sesión</h3>
-                </a>
-            </div>
+      <div class="sidebar">
+        <a href="/Api_Modelo_Predictivo/frontend/modelo.html">
+          <span class="material-icons-sharp">dashboard</span>
+          <h3>Predicción</h3>
+        </a>
+        <a href="/tenistas.html" class="active">
+          <span class="material-icons-sharp">person_outline</span>
+          <h3>Tenista</h3>
+        </a>
+        <a href="/conductor.html">
+          <span class="material-icons-sharp">person_outline</span>
+          <h3>Conductores</h3>
+        </a>
+        <a href="/prueba2.html">
+          <span class="material-icons-sharp">insights</span>
+          <h3>Solicitudes</h3>
+        </a>
+        <a href="/reservas.html">
+          <span class="material-icons-sharp">receipt_long</span>
+          <h3>Reservas</h3>
+        </a>
+        <a href="/inicio_sesion.html">
+          <span class="material-icons-sharp">logout</span>
+          <h3>Cerrar Sesión</h3>
+        </a>
+      </div>
     </aside>
 
-        <main>
-            <h1>Tenistas</h1>
-            <div class="recent-orders">
-                <div class="card">
-                    <div class="table-wrap">
-                      <table id="tbl-tenistas">
-                            <thead>
-                            <tr>
-                                <th>Id</th>
-                                <th>Nombre</th>
-                                <th>Apellido</th>
-                                <th>Correo</th>
-                                <th>Numero</th>
-                                
-                            </tr>
-                            </thead>
-                            <tbody id="tbody-tenistas">
-                            <tr><td colspan="6" style="text-align:center;">Cargando...</td></tr>
-                             </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-          
+    <main>
+      <h1>Tenistas</h1>
 
-        </main>
-
-        <div class="right-section">
-            <div class="nav">
-                <button id="menu-btn">
-                    <span class="material-icons-sharp">
-                        menu
-                    </span>
-                </button>
-                <div class="dark-mode">
-                    <span class="material-icons-sharp active">
-                        light_mode
-                    </span>
-                    <span class="material-icons-sharp">
-                        dark_mode
-                    </span>
-                </div>
-
-                <div class="profile">
-                    <div class="info">
-                        <p>Hola, <b>Helena</b></p>
-                        <small class="text-muted">Coordinador</small>
-                    </div>
-                </div>
-            </div>
+      <div class="recent-orders">
+        <div class="card">
+          <div class="table-wrap">
+            <table id="tbl-tenistas" aria-label="Tabla de tenistas">
+              <thead>
+                <tr>
+                  <th>Id</th>
+                  <th>Nombre</th>
+                  <th>Apellido</th>
+                  <th>Correo</th>
+                  <th>Número</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-tenistas">
+                <tr><td colspan="5" style="text-align:center;">Cargando…</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-    </div>
+      </div>
+    </main>
 
-     <script>
-    const API_BASE = "https://query-uniprotkb-few-isolation.trycloudflare.com/api";  // cambia a tu endpoint real
-    const TOKEN = localStorage.getItem("coord_token") || "";
+    <div class="right-section">
+      <div class="nav">
+        <button id="menu-btn"><span class="material-icons-sharp">menu</span></button>
+        <div class="dark-mode">
+          <span class="material-icons-sharp active">light_mode</span>
+          <span class="material-icons-sharp">dark_mode</span>
+        </div>
+        <div class="profile">
+          <div class="info">
+            <p>Hola, <b id="coordinadorNombre">—</b></p>
+            <small class="text-muted">Coordinador</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ====== CONFIG ====== */
+    const API_BASE = "https://reflected-slim-seen-volvo.trycloudflare.com/api"; // mismo host que el resto
+    const TOKEN    = localStorage.getItem("coord_token") || "";
+
+    /* ====== HELPERS ====== */
+    function headersJSON(method){
+      const h = { "Accept": "application/json" };
+      if (method) h["Content-Type"] = "application/json";
+      if (TOKEN)  h["Authorization"] = "Token " + TOKEN;   // <- Token, no Bearer
+      return h;
+    }
 
     async function fetchJSON(url, opts = {}) {
-      const headers = {
-        "Accept": "application/json",
-        ...(opts.method ? { "Content-Type": "application/json" } : {}),
-        ...(TOKEN ? { "Authorization": "Bearer " + TOKEN } : {})
-      };
-      const r = await fetch(url, { ...opts, headers });
-      if (!r.ok) throw new Error("Error HTTP " + r.status);
+      const r = await fetch(url, { ...opts, headers: headersJSON(opts.method) });
+      if (!r.ok) throw new Error("HTTP " + r.status);
       return r.json();
     }
 
-    async function loadTenistas() {
-      try {
-        const data = await fetchJSON(`${API_BASE}/tenistas/`);
-        const tenistas = data.results || data;
+    // Soporte paginación DRF (results/next) o array plano
+    async function fetchAll(url){
+      const out = [];
+      let next = url;
+      while (next) {
+        const data = await fetchJSON(next);
+        if (Array.isArray(data)) { out.push(...data); break; }
+        if (Array.isArray(data.results)) out.push(...data.results);
+        next = data.next || null;
+      }
+      return out;
+    }
 
-        if (!tenistas.length) {
-          document.querySelector("#tbody-tenistas").innerHTML =
-            `<tr><td colspan="5" style="text-align:center;">No hay tenistas</td></tr>`;
-          return;
-        }
+    function safe(v, def=""){ return (v===null||v===undefined) ? def : v; }
 
-        const rows = tenistas.map(t => `
-          <tr>
-            <td>${t.id}</td>
-            <td>${t.nombre || ""}</td>
-            <td>${t.apellido || ""}</td>
-            <td>${t.correo || ""}</td>
-            <td>${t.numero || ""}</td>
-          </tr>
-        `).join("");
+    /* ====== TENISTAS ====== */
+    function renderTenistas(list){
+      const $tbody = document.getElementById("tbody-tenistas");
+      if(!list.length){
+        $tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No hay tenistas</td></tr>`;
+        return;
+      }
+      const rows = list.map(t => `
+        <tr>
+          <td>${safe(t.id,"")}</td>
+          <td>${safe(t.nombre,"")}</td>
+          <td>${safe(t.apellido,"")}</td>
+          <td>${safe(t.correo,"")}</td>
+          <td>${safe(t.numero,"")}</td>
+        </tr>
+      `).join("");
+      $tbody.innerHTML = rows;
+    }
 
-        document.querySelector("#tbody-tenistas").innerHTML = rows;
-      } catch (e) {
+    async function loadTenistas(){
+      const $tbody = document.getElementById("tbody-tenistas");
+      $tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Cargando…</td></tr>`;
+      try{
+        const tenistas = await fetchAll(`${API_BASE}/tenistas/`);
+        renderTenistas(tenistas);
+      }catch(e){
         console.error(e);
-        document.querySelector("#tbody-tenistas").innerHTML =
-          `<tr><td colspan="5" style="text-align:center;color:red;">Error cargando tenistas</td></tr>`;
+        $tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:red;">Error cargando tenistas</td></tr>`;
       }
     }
 
-    // inicia carga
-    loadTenistas();
+    /* ====== NOMBRE DEL COORDINADOR ====== */
+    (function pintarDesdeCache(){
+      const cached = localStorage.getItem('coord_name');
+      const el = document.getElementById('coordinadorNombre');
+      el.textContent = cached || '—';
+    })();
+
+    async function cargarCoordinador(){
+      const nameEl = document.getElementById('coordinadorNombre');
+      const candidates = [
+        `${API_BASE}/coordinadores/me/`,
+        `${API_BASE}/coordinadores/?activo=true`,
+        `${API_BASE}/coordinadores/`
+      ];
+      for(const url of candidates){
+        try{
+          const data = await fetchJSON(url);
+          let item = null;
+          if (Array.isArray(data?.results) && data.results.length) item = data.results[0];
+          else if (Array.isArray(data) && data.length) item = data[0];
+          else if (data && typeof data === 'object') item = data;
+
+          if (item) {
+            const nombre = [item.nombre, item.apellido].filter(Boolean).join(' ')
+                          || item.nombre || item.user || null;
+            if (nombre) {
+              nameEl.textContent = nombre;
+              localStorage.setItem('coord_name', nombre);
+              return;
+            }
+          }
+        }catch(_){ /* probar el siguiente endpoint */ }
+      }
+      // si ninguno funciona, deja el cache o "—"
+    }
+
+    /* ====== INIT ====== */
+    (async () => {
+      await Promise.all([cargarCoordinador(), loadTenistas()]);
+    })();
   </script>
+
   <script src="/js/coordinador.js"></script>
 </body>
 </html>

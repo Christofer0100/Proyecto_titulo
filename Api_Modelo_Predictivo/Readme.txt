@@ -7,8 +7,8 @@ Crear entorno:
    .\.venv\Scripts\activate
 
 Instaladores: 
-   pip install -r requirements.txt
-
+   
+pip install -r requirements.txt
 
 Entrenar:
    cd backend

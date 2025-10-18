@@ -7,375 +7,396 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
   <link rel="stylesheet" href="/css/prediccion.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- Overrides mínimos para que las barras sean idénticas a “Solicitudes” -->
+  <style>
+    .pred-header{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:8px}
+    .barra-externa{width:100%;height:12px;border-radius:10px;background:var(--badge-bg);border:1px solid var(--border-strong);overflow:hidden}
+    .barra-progreso{height:100%;background:#0f59c9}
+    .kpi-box .kpi-header{margin-bottom:6px}
+    .chip-modelo{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--badge-bg);border:1px solid var(--border-strong);font-size:.85rem}
+    .barra-superior{display:flex;gap:12px;margin-bottom:10px}
+    .badge-modelo.badge-azul{background:#e8f1ff;border:1px solid #cfe0ff}
+    .badge-modelo.badge-amarillo{background:#fff8e6;border:1px solid #ffe1a8}
+  </style>
 </head>
 <body>
 
   <div class="container">
-
     <aside>
-            <div class="toggle">
-                <div class="logo">
-                    <img src="/imagenes/3.jpg">
-                    <h2><span class="primary">ATP</span></h2>
-                </div>
-                <div class="close" id="close-btn">
-                    <span class="material-icons-sharp">
-                        close
-                    </span>
-                </div>
-            </div>
+      <div class="toggle">
+        <div class="logo">
+          <img src="/imagenes/3.jpg" alt="">
+          <h2><span class="primary">ATP</span></h2>
+        </div>
+        <div class="close" id="close-btn">
+          <span class="material-icons-sharp">close</span>
+        </div>
+      </div>
 
-            <div class="sidebar">
-                <a href="#" class="active">
-                    <span class="material-icons-sharp">
-                        dashboard
-                    </span>
-                    <h3>Predicción</h3>
-                </a>
-                <a href="/tenistas.html">
-                    <span class="material-icons-sharp">
-                        person_outline
-                    </span>
-                    <h3>Tenista</h3>
-                </a>
-                <a href="/conductor.html">
-                    <span class="material-icons-sharp">
-                        person_outline
-                    </span>
-                    <h3>Conductores</h3>
-                </a>
-                <a href="/prueba2.html" class="">
-                    <span class="material-icons-sharp">
-                        insights
-                    </span>
-                    <h3>Solicitudes</h3>
-                </a>
-                <a href="/reservas.html">
-                    <span class="material-icons-sharp">
-                        receipt_long
-                    </span>
-                    <h3>Reservas</h3>
-                </a>
-                <a href="/inicio_sesion.html">
-                    <span class="material-icons-sharp">
-                        logout
-                    </span>
-                    <h3>Cerrar Sesión</h3>
-                </a>
-            </div>
+      <div class="sidebar">
+        <a href="#" class="active">
+          <span class="material-icons-sharp">dashboard</span>
+          <h3>Predicción</h3>
+        </a>
+        <a href="/tenistas.html">
+          <span class="material-icons-sharp">person_outline</span>
+          <h3>Tenista</h3>
+        </a>
+        <a href="/conductor.html">
+          <span class="material-icons-sharp">person_outline</span>
+          <h3>Conductores</h3>
+        </a>
+        <a href="/prueba2.html">
+          <span class="material-icons-sharp">insights</span>
+          <h3>Solicitudes</h3>
+        </a>
+        <a href="/reservas.html">
+          <span class="material-icons-sharp">receipt_long</span>
+          <h3>Reservas</h3>
+        </a>
+        <a href="/inicio_sesion.html">
+          <span class="material-icons-sharp">logout</span>
+          <h3>Cerrar Sesión</h3>
+        </a>
+      </div>
     </aside>
 
-      <main>
-  <h1 class="titulo-modelo">Modelo Predictivo</h1>
+    <main>
+      <h1 class="titulo-modelo">Modelo Predictivo</h1>
 
-  <div class="barra-superior">
-    <span class="chip-modelo"><i class="material-icons-sharp">smart_toy</i> Calibrado</span>
-    <span class="chip-modelo"><i class="material-icons-sharp">analytics</i> Probabilidades</span>
-  </div>
-
-  <div class="card-modelo">
-    <div class="fila-controles">
-      <div class="campo">
-        <label>Día</label>
-        <select id="selDia" class="select-modelo">
-          <option value="0">Lunes</option>
-          <option value="1">Martes</option>
-          <option value="2">Miércoles</option>
-          <option value="3">Jueves</option>
-          <option value="4">Viernes</option>
-          <option value="5">Sábado</option>
-          <option value="6">Domingo</option>
-        </select>
+      <div class="barra-superior">
+        <span class="chip-modelo"><i class="material-icons-sharp">smart_toy</i> Calibrado</span>
+        <span class="chip-modelo"><i class="material-icons-sharp">analytics</i> Probabilidades</span>
       </div>
 
-      <div class="campo">
-        <label>Hora seleccionada</label>
-        <input type="range" id="rngHora" min="0" max="23" step="1" value="14" class="range-modelo" />
-        <div class="hora-ticks">
-          <small>00:00</small>
-          <small>06:00</small>
-          <small>12:00</small>
-          <small>18:00</small>
-          <small>23:00</small>
-        </div>
-      </div>
+      <div class="card-modelo">
+        <div class="fila-controles">
+          <div class="campo">
+            <label>Día</label>
+            <select id="selDia" class="select-modelo">
+              <option value="0">Lunes</option>
+              <option value="1">Martes</option>
+              <option value="2">Miércoles</option>
+              <option value="3">Jueves</option>
+              <option value="4">Viernes</option>
+              <option value="5">Sábado</option>
+              <option value="6">Domingo</option>
+            </select>
+          </div>
 
-      <div class="campo">
-        <label>Hora</label>
-        <input type="text" id="lblHora" class="input-modelo" readonly value="14:00" />
-      </div>
-
-      <div class="botones-modelo">
-        <button id="btnCalcular" class="btn-modelo">Calcular</button>
-        <button id="btnExplorar" class="btn-outline-modelo">Explorar día</button>
-      </div>
-    </div>
-
-    <div class="fila-kpi">
-      <div class="kpi-box">
-        <div class="kpi-header">Origen más probable</div>
-        <div id="kpiOrigen" class="kpi-valor">—</div>
-      </div>
-      <div class="kpi-box">
-        <div class="kpi-header">Destino más probable</div>
-        <div id="kpiDestino" class="kpi-valor">—</div>
-      </div>
-    </div>
-
-    <div id="msg" class="tip-modelo">Listo.</div>
-  </div>
-
-  <div class="fila-predicciones">
-    <div class="card-modelo">
-      <div class="pred-header">
-        <span>Origen</span>
-        <span id="badgeO" class="badge-modelo">—</span>
-      </div>
-      <div class="pred-body">
-        <div id="origenLabel" class="pred-label">—</div>
-        <div id="origenPct" class="pred-pct">—%</div>
-        <div class="barra-externa"><div id="origenBar" class="barra-progreso" style="width: 0%"></div></div>
-      </div>
-    </div>
-
-    <div class="card-modelo">
-      <div class="pred-header">
-        <span>Destino</span>
-        <span id="badgeD" class="badge-modelo">—</span>
-      </div>
-      <div class="pred-body">
-        <div id="destinoLabel" class="pred-label">—</div>
-        <div id="destinoPct" class="pred-pct">—%</div>
-        <div class="barra-externa"><div id="destinoBar" class="barra-progreso" style="width: 0%"></div></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card-modelo">
-    <div class="exploracion-header">
-      <h2>Exploración del día (24 h)</h2>
-      <div>
-        <span class="badge-modelo badge-azul">Origen</span>
-        <span class="badge-modelo badge-amarillo">Destino</span>
-      </div>
-    </div>
-    <canvas id="chartDay" height="110"></canvas>
-    <div id="labelsLinea" class="linea-detalle"></div>
-  </div>
-</main>
-
-
-        <div class="right-section">
-            <div class="nav">
-                <button id="menu-btn">
-                    <span class="material-icons-sharp">
-                        menu
-                    </span>
-                </button>
-                <div class="dark-mode">
-                    <span class="material-icons-sharp active">
-                        light_mode
-                    </span>
-                    <span class="material-icons-sharp">
-                        dark_mode
-                    </span>
-                </div>
-
-                <div class="profile">
-                    <div class="info">
-                        <p class="h">Hola, <b>Helena</b></p>
-                        <small class="text-muted">Coordinador</small>
-                    </div>
-                </div>
+          <div class="campo">
+            <label>Hora seleccionada</label>
+            <input type="range" id="rngHora" min="0" max="23" step="1" value="14" class="range-modelo" />
+            <div class="hora-ticks">
+              <small>00:00</small>
+              <small>06:00</small>
+              <small>12:00</small>
+              <small>18:00</small>
+              <small>23:00</small>
             </div>
+          </div>
+
+          <div class="campo">
+            <label>Hora</label>
+            <input type="text" id="lblHora" class="input-modelo" readonly value="14:00" />
+          </div>
+
+          <div class="botones-modelo">
+            <button id="btnCalcular" class="btn-modelo">Calcular</button>
+            <button id="btnExplorar" class="btn-outline-modelo">Explorar día</button>
+          </div>
         </div>
-        
 
+        <div class="fila-kpi">
+          <div class="kpi-box">
+            <div class="kpi-header">Origen más probable</div>
+            <div id="kpiOrigen" class="kpi-valor">—</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-header">Destino más probable</div>
+            <div id="kpiDestino" class="kpi-valor">—</div>
+          </div>
+        </div>
 
+        <div id="msg" class="tip-modelo">Listo.</div>
+      </div>
+
+      <div class="fila-predicciones">
+        <div class="card-modelo">
+          <div class="pred-header">
+            <span>Origen</span>
+            <span id="badgeO" class="badge-modelo">—</span>
+          </div>
+          <div class="pred-body">
+            <div id="origenLabel" class="pred-label">—</div>
+            <div id="origenPct" class="pred-pct">—%</div>
+            <div class="barra-externa"><div id="origenBar" class="barra-progreso" style="width:0%"></div></div>
+          </div>
+        </div>
+
+        <div class="card-modelo">
+          <div class="pred-header">
+            <span>Destino</span>
+            <span id="badgeD" class="badge-modelo">—</span>
+          </div>
+          <div class="pred-body">
+            <div id="destinoLabel" class="pred-label">—</div>
+            <div id="destinoPct" class="pred-pct">—%</div>
+            <div class="barra-externa"><div id="destinoBar" class="barra-progreso" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-modelo">
+        <div class="exploracion-header">
+          <h2>Exploración del día (24 h)</h2>
+          <div>
+            <span class="badge-modelo badge-azul">Origen</span>
+            <span class="badge-modelo badge-amarillo">Destino</span>
+          </div>
+        </div>
+        <canvas id="chartDay" height="110"></canvas>
+        <div id="labelsLinea" class="linea-detalle"></div>
+      </div>
+    </main>
+
+    <div class="right-section">
+      <div class="nav">
+        <button id="menu-btn">
+          <span class="material-icons-sharp">menu</span>
+        </button>
+        <div class="dark-mode">
+          <span class="material-icons-sharp active">light_mode</span>
+          <span class="material-icons-sharp">dark_mode</span>
+        </div>
+        <div class="profile">
+          <div class="info">
+            <p class="h">Hola, <b id="coordinadorNombre">Cargando…</b></p>
+            <small class="text-muted">Coordinador</small>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
+  <!-- Lógica de Predicción -->
+  <script>
+    const API_ORIGEN  = 'http://127.0.0.1:8000/predict/origen';
+    const API_DESTINO = 'http://127.0.0.1:8000/predict/destino';
 
+    const selDia = document.getElementById('selDia');
+    const rngHora = document.getElementById('rngHora');
+    const lblHora = document.getElementById('lblHora');
+    const btnCalcular = document.getElementById('btnCalcular');
+    const btnExplorar = document.getElementById('btnExplorar');
+    const msg = document.getElementById('msg');
 
+    const kpiOrigen = document.getElementById('kpiOrigen');
+    const kpiDestino = document.getElementById('kpiDestino');
 
+    const origenLabel = document.getElementById('origenLabel');
+    const destinoLabel = document.getElementById('destinoLabel');
+    const origenPct = document.getElementById('origenPct');
+    const destinoPct = document.getElementById('destinoPct');
+    const origenBar = document.getElementById('origenBar');
+    const destinoBar = document.getElementById('destinoBar');
+    const badgeO = document.getElementById('badgeO');
+    const badgeD = document.getElementById('badgeD');
 
-<script>
-  const API_ORIGEN  = 'http://127.0.0.1:8000/predict/origen';
-  const API_DESTINO = 'http://127.0.0.1:8000/predict/destino';
+    const labelsLinea = document.getElementById('labelsLinea');
 
-  const selDia = document.getElementById('selDia');
-  const rngHora = document.getElementById('rngHora');
-  const lblHora = document.getElementById('lblHora');
-  const btnCalcular = document.getElementById('btnCalcular');
-  const btnExplorar = document.getElementById('btnExplorar');
-  const msg = document.getElementById('msg');
+    const cache = {};
+    function pad2(n){ return String(n).padStart(2,'0'); }
+    function toPctNum(x){ if(typeof x!=='number'||isNaN(x)) return null; return x>1?x:(x*100); }
+    function toPctText(x){ const v=toPctNum(x); return v===null?'—%':`${v.toFixed(2)}%`; }
+    function setHourLabel(){ lblHora.value = `${pad2(+rngHora.value)}:00`; }
+    rngHora.addEventListener('input', setHourLabel);
 
-  const kpiOrigen = document.getElementById('kpiOrigen');
-  const kpiDestino = document.getElementById('kpiDestino');
+    (function initNow(){
+      const jsDay = new Date().getDay();          // 0=Dom..6=Sab
+      selDia.value = String((jsDay + 6) % 7);     // 0=Lun..6=Dom
+      const now = new Date();
+      rngHora.value = now.getHours();
+      setHourLabel();
+    })();
 
-  const origenLabel = document.getElementById('origenLabel');
-  const destinoLabel = document.getElementById('destinoLabel');
-  const origenPct = document.getElementById('origenPct');
-  const destinoPct = document.getElementById('destinoPct');
-  const origenBar = document.getElementById('origenBar');
-  const destinoBar = document.getElementById('destinoBar');
-  const badgeO = document.getElementById('badgeO');
-  const badgeD = document.getElementById('badgeD');
-
-  const labelsLinea = document.getElementById('labelsLinea');
-
-  const cache = {};
-
-  function pad2(n){ return String(n).padStart(2,'0'); }
-  function toPctNum(x){ if(typeof x!=='number'||isNaN(x)) return null; return x>1?x:(x*100); }
-  function toPctText(x){ const v=toPctNum(x); return v===null?'—%':`${v.toFixed(2)}%`; }
-  function setHourLabel(){ lblHora.value = `${pad2(+rngHora.value)}:00`; }
-  rngHora.addEventListener('input', setHourLabel);
-
-  (function initNow(){
-    const jsDay = new Date().getDay();
-    selDia.value = String((jsDay + 6) % 7);
-    const now = new Date();
-    rngHora.value = now.getHours();
-    setHourLabel();
-  })();
-
-  function pickLabelAndProb(res, kind){
-    if(res?.top1?.label){
-      return { label: res.top1.label, prob: res.top1.probability ?? res.top1.prob ?? res.top1.proba };
-    }
-    if(Array.isArray(res?.predicciones) && res.predicciones.length){
-      const it = res.predicciones[0];
-      const lbl = it.label ?? it[kind] ?? null;
-      const p = it.probability ?? it.prob ?? it.proba;
-      return { label: lbl, prob: p };
-    }
-    if(Array.isArray(res?.prediccion) && res.prediccion.length){
-      return { label: res.prediccion[0], prob: undefined };
-    }
-    return { label: null, prob: undefined };
-  }
-
-  async function postJSON(url, payload){
-    const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
-  }
-
-  function setLoading(on){
-    if(on){
-      msg.textContent='Consultando…';
-      btnCalcular.disabled = true; btnExplorar.disabled = true;
-      origenBar.classList.add('skeleton'); destinoBar.classList.add('skeleton');
-    }else{
-      btnCalcular.disabled = false; btnExplorar.disabled = false;
-      origenBar.classList.remove('skeleton'); destinoBar.classList.remove('skeleton');
-    }
-  }
-
-  function paintPoint(o, d, day, hour){
-    origenLabel.textContent = o.label ?? '—';
-    destinoLabel.textContent = d.label ?? '—';
-
-    const po = toPctNum(o.prob); const pd = toPctNum(d.prob);
-    origenPct.textContent = toPctText(o.prob); destinoPct.textContent = toPctText(d.prob);
-    origenBar.style.width = po===null?'0%':`${po.toFixed(2)}%`;
-    destinoBar.style.width = pd===null?'0%':`${pd.toFixed(2)}%`;
-    origenBar.setAttribute('aria-valuenow', po ?? 0);
-    destinoBar.setAttribute('aria-valuenow', pd ?? 0);
-
-    badgeO.textContent = `Día ${day} · ${pad2(hour)}:00`;
-    badgeD.textContent = `Día ${day} · ${pad2(hour)}:00`;
-
-    kpiOrigen.textContent = o.label ?? '—';
-    kpiDestino.textContent = d.label ?? '—';
-  }
-
-  async function calcularPuntual(){
-    const d = +selDia.value; const h = +rngHora.value; const key = `${d}-${h}`;
-    setLoading(true);
-    try{
-      if(!cache[key]){
-        const payload = { rows:[{dia_semana:d, hora_num:h}], top_n:1, with_proba:true };
-        const [oRes, dRes] = await Promise.all([ postJSON(API_ORIGEN,payload), postJSON(API_DESTINO,payload) ]);
-        cache[key] = { origen: pickLabelAndProb(oRes,'origen'), destino: pickLabelAndProb(dRes,'destino') };
+    function pickLabelAndProb(res, kind){
+      if(res?.top1?.label){
+        return { label: res.top1.label, prob: res.top1.probability ?? res.top1.prob ?? res.top1.proba };
       }
-      paintPoint(cache[key].origen, cache[key].destino, d, h);
-      msg.textContent='Listo.';
-    }catch(e){
-      console.error(e); msg.textContent='Error consultando el servicio.';
-    }finally{ setLoading(false); }
-  }
-
-  let dayChart;
-  function mapToIndex(a,b){
-    const set = new Set([...a,...b]); const labels = Array.from(set);
-    const m = new Map(labels.map((v,i)=>[v,i]));
-    return { labels, a: a.map(v=>m.get(v)), b: b.map(v=>m.get(v)) };
-  }
-
-  function renderTimeline(hours, oLabels, dLabels){
-    const ctx = document.getElementById('chartDay').getContext('2d');
-    const map = mapToIndex(oLabels, dLabels);
-    if(dayChart) dayChart.destroy();
-    dayChart = new Chart(ctx, {
-      type:'line',
-      data:{
-        labels: hours.map(h=>`${pad2(h)}:00`),
-        datasets:[
-          { label:'Origen', data:map.a, borderWidth:2, tension:0, stepped:true },
-          { label:'Destino', data:map.b, borderWidth:2, tension:0, stepped:true }
-        ]
-      },
-      options:{
-        scales:{ y:{ ticks:{ callback:(v)=>map.labels[v]??'' }, beginAtZero:true, precision:0 } },
-        plugins:{
-          legend:{ position:'top' },
-          tooltip:{ callbacks:{ label:(ctx)=>`${ctx.dataset.label}: ${map.labels[ctx.parsed.y]??''}` } }
-        }
+      if(Array.isArray(res?.predicciones) && res.predicciones.length){
+        const it = res.predicciones[0];
+        const lbl = it.label ?? it[kind] ?? null;
+        const p = it.probability ?? it.prob ?? it.proba;
+        return { label: lbl, prob: p };
       }
-    });
+      if(Array.isArray(res?.prediccion) && res.prediccion.length){
+        return { label: res.prediccion[0], prob: undefined };
+      }
+      return { label: null, prob: undefined };
+    }
 
-    labelsLinea.innerHTML='';
-    hours.forEach((h,i)=>{
-      const pill=document.createElement('span');
-      pill.className='badge text-bg-light border me-2 mb-2';
-      pill.innerHTML=`<strong>${pad2(h)}:00</strong> · <span class="text-primary">${oLabels[i]}</span> | <span class="text-warning">${dLabels[i]}</span>`;
-      labelsLinea.appendChild(pill);
-    });
-  }
+    async function postJSON(url, payload){
+      const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    }
 
-  async function explorarDia(){
-    const d = +selDia.value; const hours = [...Array(24).keys()];
-    const oL=[]; const dL=[];
-    setLoading(true);
-    try{
-      for(let h=0; h<24; h++){
-        const key=`${d}-${h}`;
+    function setLoading(on){
+      if(on){
+        msg.textContent='Consultando…';
+        btnCalcular.disabled = true; btnExplorar.disabled = true;
+        origenBar.classList.add('skeleton'); destinoBar.classList.add('skeleton');
+      }else{
+        btnCalcular.disabled = false; btnExplorar.disabled = false;
+        origenBar.classList.remove('skeleton'); destinoBar.classList.remove('skeleton');
+      }
+    }
+
+    function paintPoint(o, d, day, hour){
+      origenLabel.textContent = o.label ?? '—';
+      destinoLabel.textContent = d.label ?? '—';
+
+      const po = toPctNum(o.prob); const pd = toPctNum(d.prob);
+      origenPct.textContent = toPctText(o.prob);
+      destinoPct.textContent = toPctText(d.prob);
+      origenBar.style.width = po===null ? '0%' : `${po.toFixed(2)}%`;
+      destinoBar.style.width = pd===null ? '0%' : `${pd.toFixed(2)}%`;
+      origenBar.setAttribute('aria-valuenow', po ?? 0);
+      destinoBar.setAttribute('aria-valuenow', pd ?? 0);
+
+      badgeO.textContent = `Día ${day} · ${pad2(hour)}:00`;
+      badgeD.textContent = `Día ${day} · ${pad2(hour)}:00`;
+
+      kpiOrigen.textContent = o.label ?? '—';
+      kpiDestino.textContent = d.label ?? '—';
+    }
+
+    async function calcularPuntual(){
+      const d = +selDia.value; const h = +rngHora.value; const key = `${d}-${h}`;
+      setLoading(true);
+      try{
         if(!cache[key]){
           const payload = { rows:[{dia_semana:d, hora_num:h}], top_n:1, with_proba:true };
           const [oRes, dRes] = await Promise.all([ postJSON(API_ORIGEN,payload), postJSON(API_DESTINO,payload) ]);
           cache[key] = { origen: pickLabelAndProb(oRes,'origen'), destino: pickLabelAndProb(dRes,'destino') };
         }
-        oL.push(cache[key].origen.label ?? '—');
-        dL.push(cache[key].destino.label ?? '—');
-        msg.textContent = `Explorando el día… ${h+1}/24`;
+        paintPoint(cache[key].origen, cache[key].destino, d, h);
+        msg.textContent='Listo.';
+      }catch(e){
+        console.error(e); msg.textContent='Error consultando el servicio.';
+      }finally{ setLoading(false); }
+    }
+
+    let dayChart;
+    function mapToIndex(a,b){
+      const set = new Set([...a,...b]); const labels = Array.from(set);
+      const m = new Map(labels.map((v,i)=>[v,i]));
+      return { labels, a: a.map(v=>m.get(v)), b: b.map(v=>m.get(v)) };
+    }
+
+    function renderTimeline(hours, oLabels, dLabels){
+      const ctx = document.getElementById('chartDay').getContext('2d');
+      const map = mapToIndex(oLabels, dLabels);
+      if(dayChart) dayChart.destroy();
+      dayChart = new Chart(ctx, {
+        type:'line',
+        data:{
+          labels: hours.map(h=>`${pad2(h)}:00`),
+          datasets:[
+            { label:'Origen', data:map.a, borderWidth:2, pointRadius:2, tension:0, stepped:true },
+            { label:'Destino', data:map.b, borderWidth:2, pointRadius:2, tension:0, stepped:true }
+          ]
+        },
+        options:{
+          scales:{ y:{ ticks:{ callback:(v)=>map.labels[v]??'' }, beginAtZero:true, precision:0 } },
+          plugins:{
+            legend:{ position:'top' },
+            tooltip:{ callbacks:{ label:(ctx)=>`${ctx.dataset.label}: ${map.labels[ctx.parsed.y]??''}` } }
+          }
+        }
+      });
+
+      labelsLinea.innerHTML='';
+      hours.forEach((h,i)=>{
+        const pill=document.createElement('span');
+        pill.className='badge text-bg-light border me-2 mb-2';
+        pill.innerHTML=`<strong>${pad2(h)}:00</strong> · <span class="text-primary">${oLabels[i]}</span> | <span class="text-warning">${dLabels[i]}</span>`;
+        labelsLinea.appendChild(pill);
+      });
+    }
+
+    async function explorarDia(){
+      const d = +selDia.value; const hours = [...Array(24).keys()];
+      const oL=[]; const dL=[];
+      setLoading(true);
+      try{
+        for(let h=0; h<24; h++){
+          const key=`${d}-${h}`;
+          if(!cache[key]){
+            const payload = { rows:[{dia_semana:d, hora_num:h}], top_n:1, with_proba:true };
+            const [oRes, dRes] = await Promise.all([ postJSON(API_ORIGEN,payload), postJSON(API_DESTINO,payload) ]);
+            cache[key] = { origen: pickLabelAndProb(oRes,'origen'), destino: pickLabelAndProb(dRes,'destino') };
+          }
+          oL.push(cache[key].origen.label ?? '—');
+          dL.push(cache[key].destino.label ?? '—');
+          msg.textContent = `Explorando el día… ${h+1}/24`;
+        }
+        renderTimeline(hours, oL, dL);
+        msg.textContent='Listo.';
+      }catch(e){
+        console.error(e); msg.textContent='No se pudo explorar el día.';
+      }finally{ setLoading(false); }
+    }
+
+    btnCalcular.addEventListener('click', calcularPuntual);
+    btnExplorar.addEventListener('click', explorarDia);
+    selDia.addEventListener('change', calcularPuntual);
+    rngHora.addEventListener('change', ()=>{ setHourLabel(); calcularPuntual(); });
+
+    calcularPuntual();
+  </script>
+
+  <!-- Nombre real del coordinador (igual que en otras páginas) -->
+  <script>
+    const API_BASE = 'https://reflected-slim-seen-volvo.trycloudflare.com/api';
+    const TOKEN = localStorage.getItem('coord_token') || '';
+    function headersJSON(){
+      const h = { 'Accept': 'application/json' };
+      if (TOKEN) h['Authorization'] = 'Token ' + TOKEN;
+      return h;
+    }
+    async function fetchJSON(url){
+      const r = await fetch(url, { headers: headersJSON() });
+      if(!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json();
+    }
+    async function cargarCoordinador(){
+      const el = document.getElementById('coordinadorNombre');
+      const urls = [
+        `${API_BASE}/coordinadores/me/`,
+        `${API_BASE}/coordinadores/?activo=true`,
+        `${API_BASE}/coordinadores/`
+      ];
+      for(const u of urls){
+        try{
+          const d = await fetchJSON(u);
+          let it = null;
+          if(Array.isArray(d?.results) && d.results.length) it = d.results[0];
+          else if(Array.isArray(d) && d.length) it = d[0];
+          else if(d && typeof d==='object') it = d;
+          if(it){
+            const nombre = [it.nombre, it.apellido].filter(Boolean).join(' ') || it.nombre || it.user || null;
+            if(nombre){ el.textContent = nombre; return; }
+          }
+        }catch(_){}
       }
-      renderTimeline(hours, oL, dL);
-      msg.textContent='Listo.';
-    }catch(e){
-      console.error(e); msg.textContent='No se pudo explorar el día.';
-    }finally{ setLoading(false); }
-  }
+      el.textContent = el.textContent || 'Coordinador';
+    }
+    cargarCoordinador();
+  </script>
 
-  btnCalcular.addEventListener('click', calcularPuntual);
-  btnExplorar.addEventListener('click', explorarDia);
-  selDia.addEventListener('change', calcularPuntual);
-  rngHora.addEventListener('change', ()=>{ setHourLabel(); calcularPuntual(); });
-
-  calcularPuntual();
-</script>
-
-<script src="/js/coordinador.js"></script>
-
+  <script src="/js/coordinador.js"></script>
 </body>
 </html>
