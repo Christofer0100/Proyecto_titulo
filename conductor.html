@@ -2,186 +2,256 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <title>Solicitudes - Asignación de Conductor</title>
+  <title>Conductores</title>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Usa tu hoja de estilos de la página de conductores -->
   <link rel="stylesheet" href="css/conductor.css">
 </head>
 
-
 <body>
-
   <div class="container">
-
     <aside>
-            <div class="toggle">
-                <div class="logo">
-                    <img src="imagenes/3.jpg">
-                    <h2><span class="primary">ATP</span></h2>
-                </div>
-                <div class="close" id="close-btn">
-                    <span class="material-icons-sharp">
-                        close
-                    </span>
-                </div>
-            </div>
+      <div class="toggle">
+        <div class="logo">
+          <img src="imagenes/3.jpg" alt="logo">
+          <h2><span class="primary">ATP</span></h2>
+        </div>
+        <div class="close" id="close-btn">
+          <span class="material-icons-sharp">close</span>
+        </div>
+      </div>
 
-            <div class="sidebar">
-                <a href="/Api_Modelo_Predictivo/frontend/modelo.html">
-                    <span class="material-icons-sharp">
-                        dashboard
-                    </span>
-                    <h3>Predicción</h3>
-                </a>
-                <a href="/tenistas.html">
-                    <span class="material-icons-sharp">
-                        person_outline
-                    </span>
-                    <h3>Tenista</h3>
-                </a>
-                <a href="/conductor.html" class="active">
-                    <span class="material-icons-sharp">
-                        person_outline
-                    </span>
-                    <h3>Conductores</h3>
-                </a>
-                <a href="/prueba2.html" class="">
-                    <span class="material-icons-sharp">
-                        insights
-                    </span>
-                    <h3>Solicitudes</h3>
-                </a>
-                <a href="/reservas.html">
-                    <span class="material-icons-sharp">
-                        receipt_long
-                    </span>
-                    <h3>Reservas</h3>
-                </a>
-                <a href="/inicio_sesion.html">
-                    <span class="material-icons-sharp">
-                        logout
-                    </span>
-                    <h3>Cerrar Sesión</h3>
-                </a>
-            </div>
+      <div class="sidebar">
+        <a href="/Api_Modelo_Predictivo/frontend/modelo.html">
+          <span class="material-icons-sharp">dashboard</span>
+          <h3>Predicción</h3>
+        </a>
+        <a href="/tenistas.html">
+          <span class="material-icons-sharp">person_outline</span>
+          <h3>Tenista</h3>
+        </a>
+        <a href="/conductor.html" class="active">
+          <span class="material-icons-sharp">person_outline</span>
+          <h3>Conductores</h3>
+        </a>
+        <a href="/prueba2.html">
+          <span class="material-icons-sharp">insights</span>
+          <h3>Solicitudes</h3>
+        </a>
+        <a href="/reservas.html">
+          <span class="material-icons-sharp">receipt_long</span>
+          <h3>Reservas</h3>
+        </a>
+        <a href="/inicio_sesion.html">
+          <span class="material-icons-sharp">logout</span>
+          <h3>Cerrar Sesión</h3>
+        </a>
+      </div>
     </aside>
 
-        <main>
-            <h1>Conductores</h1>
-            <div class="recent-orders">
-                <div class="card">
-                    <div class="table-wrap">
-                      <table id="tbl-conductores">
-                            <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Patente</th>
-                                <th>Mail</th>
-                                <th>Teléfono</th>
-                                <th>Activo</th>
-                            </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-          
+    <main>
+      <h1>Conductores</h1>
 
-        </main>
-
-        <div class="right-section">
-            <div class="nav">
-                <button id="menu-btn">
-                    <span class="material-icons-sharp">
-                        menu
-                    </span>
-                </button>
-                <div class="dark-mode">
-                    <span class="material-icons-sharp active">
-                        light_mode
-                    </span>
-                    <span class="material-icons-sharp">
-                        dark_mode
-                    </span>
-                </div>
-
-                <div class="profile">
-                    <div class="info">
-                        <p>Hola, <b>Helena</b></p>
-                        <small class="text-muted">Coordinador</small>
-                    </div>
-                </div>
-            </div>
+      <!-- Toolbar -->
+      <div class="card" style="margin-bottom:14px;">
+        <div class="toolbar" style="display:grid;grid-template-columns:1fr auto auto auto;gap:10px;align-items:center;padding:12px;">
+          <input id="q" type="search" placeholder="Buscar por nombre, patente, mail o teléfono" />
+          <label style="display:flex;align-items:center;gap:8px;">
+            <span class="muted" style="white-space:nowrap;">Fecha/hora</span>
+            <input id="dt-check" type="datetime-local" />
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;white-space:nowrap;">
+            <input id="only-free" type="checkbox" />
+            <span>Sólo disponibles</span>
+          </label>
+          <span id="status" class="muted" style="justify-self:end;">—</span>
         </div>
+      </div>
+
+      <div class="recent-orders">
+        <div class="card">
+          <div class="table-wrap">
+            <table id="tbl-conductores" aria-label="Tabla de conductores">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Patente</th>
+                  <th>Mail</th>
+                  <th>Teléfono</th>
+                  <th>Activo</th>
+                </tr>
+              </thead>
+              <tbody><!-- JS --></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div class="right-section">
+      <div class="nav">
+        <button id="menu-btn"><span class="material-icons-sharp">menu</span></button>
+
+        <!-- Toggle de tema unificado -->
+        <div id="theme-toggle" class="dark-mode" role="button" aria-label="Cambiar tema">
+          <span class="material-icons-sharp" data-theme-target="light">light_mode</span>
+          <span class="material-icons-sharp" data-theme-target="dark">dark_mode</span>
+        </div>
+
+        <div class="profile">
+          <div class="info">
+            <p>Hola, <b id="coordName">—</b></p>
+            <small class="text-muted">Coordinador</small>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 
+  <!-- ======= JS (página) ======= -->
+  <script>
+    // --------- Persistencia y toggle de tema (no tocar coordinador.js) ----------
+    (function themeInit(){
+      const el = document.getElementById('theme-toggle');
+      const sun = el.querySelector('[data-theme-target="light"]');
+      const moon = el.querySelector('[data-theme-target="dark"]');
 
+      function apply(theme){
+        // Tu CSS usa .dark-mode-variables en body para el tema oscuro
+        document.body.classList.toggle('dark-mode-variables', theme === 'dark');
+        // pill visual
+        sun.classList.toggle('active', theme === 'light');
+        moon.classList.toggle('active', theme === 'dark');
+        localStorage.setItem('theme', theme);
+      }
 
-    <script>
-    const API_BASE = "https://enquiry-solar-logged-featuring.trycloudflare.com/api";
+      const initial = localStorage.getItem('theme') || 'light';
+      apply(initial);
 
-    async function fetchJSON(url) {
-      const r = await fetch(url, { headers: { "Accept": "application/json" } });
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      el.addEventListener('click', () => {
+        const next = document.body.classList.contains('dark-mode-variables') ? 'light' : 'dark';
+        apply(next);
+      });
+    })();
+
+    // ---------------- App Conductores ----------------
+    const API_BASE = "https://bulletin-spirits-what-gmt.trycloudflare.com/api";
+
+    const token = localStorage.getItem("coord_token"); // si no hay, igual cargamos público
+
+    // Elementos
+    const $tblBody   = document.querySelector("#tbl-conductores tbody");
+    const $q         = document.getElementById("q");
+    const $dt        = document.getElementById("dt-check");
+    const $onlyFree  = document.getElementById("only-free");
+    const $status    = document.getElementById("status");
+    const $coordName = document.getElementById("coordName");
+
+    // Nombre coordinador cacheado
+    (function (){
+      const cached = localStorage.getItem('coord_name');
+      $coordName.textContent = cached || '—';
+    })();
+
+    function headersJSON(){
+      const h = { "Accept": "application/json" };
+      if (token) h["Authorization"] = "Bearer " + token;
+      return h;
+    }
+    async function fetchJSON(url){
+      const r = await fetch(url, { headers: headersJSON() });
+      if(!r.ok) throw new Error(`HTTP ${r.status} ${r.statusText}`);
       return r.json();
     }
-
-    function fmtDate(s) {
-      if (!s) return "";
-      const d = new Date(s);
-      return d.toLocaleString();
-    }
-
-    function pillEstado(estado) {
-      const cls = (estado === "CONFIRMADA") ? "ok" :
-                  (estado === "EN_REVISION") ? "warn" : "";
-      return `<span class="pill ${cls}">${estado || ""}</span>`;
-    }
-
-    async function loadConductores() {
-      const data = await fetchJSON(`${API_BASE}/conductores/`);
-      const rows = (data.results || data).map(c => `
-        <tr>
-          <td>${c.nombre} ${c.apellido}</td>
-          <td>${c.patente || ""}</td>
-          <td>${c.mail}</td>
-          <td>${c.telefono || ""}</td>
-          <td>${c.activo ? "Sí" : "No"}</td>
-        </tr>
-      `).join("");
-      document.querySelector("#tbl-conductores tbody").innerHTML = rows;
-    }
-
-    (async () => {
-      try {
-        await loadConductores();
-      } catch (e) {
-        console.error(e);
-        alert("No se pudo cargar información del API.");
+    async function fetchAll(url){
+      const acc = [];
+      let next = url;
+      while(next){
+        const data = await fetchJSON(next);
+        if (Array.isArray(data?.results)) { acc.push(...data.results); next = data.next; }
+        else if (Array.isArray(data))     { acc.push(...data); next = null; }
+        else { next = null; }
       }
+      return acc;
+    }
+
+    const fmtPhone = s => s || "";
+    const pillActivo = a => `<span class="pill ${a ? 'ok':'warn'}">${a ? 'Sí':'No'}</span>`;
+
+    function render(conductores){
+      const term = ($q.value || "").trim().toLowerCase();
+      const filtered = !term ? conductores : conductores.filter(c => {
+        const nombre = `${c.nombre||''} ${c.apellido||''}`.toLowerCase();
+        const patente = (c.patente||'').toLowerCase();
+        const mail = (c.mail||'').toLowerCase();
+        const tel = (c.telefono||'').toLowerCase();
+        return nombre.includes(term) || patente.includes(term) || mail.includes(term) || tel.includes(term);
+      });
+
+      $tblBody.innerHTML = filtered.length
+        ? filtered.map(c => `
+            <tr>
+              <td>${c.nombre||''} ${c.apellido||''}</td>
+              <td>${c.patente||''}</td>
+              <td>${c.mail||''}</td>
+              <td>${fmtPhone(c.telefono)}</td>
+              <td>${pillActivo(!!c.activo)}</td>
+            </tr>
+          `).join("")
+        : `<tr><td colspan="5" class="muted" style="text-align:center;padding:28px;">Sin resultados</td></tr>`;
+
+      $status.textContent = `${filtered.length} resultado(s)`;
+    }
+
+    function parseDatetimeLocalValueToDate(v){
+      if(!v) return null;
+      const [date, time] = v.split('T');
+      const [Y,M,D] = date.split('-').map(Number);
+      const [h,m] = (time||'00:00').split(':').map(Number);
+      return new Date(Y, (M||1)-1, D||1, h||0, m||0, 0, 0);
+    }
+    function setDefaultDateTime(){
+      const now = new Date(Date.now()+30*60*1000);
+      const p = n => String(n).padStart(2,'0');
+      const v = `${now.getFullYear()}-${p(now.getMonth()+1)}-${p(now.getDate())}T${p(now.getHours())}:${p(now.getMinutes())}`;
+      $dt.value = v;
+    }
+
+    async function loadConductores(){
+      $status.textContent = "Cargando…";
+      const dtVal = $dt.value;
+      const onlyFree = $onlyFree.checked;
+
+      try{
+        let url = `${API_BASE}/conductores/`;
+        if (onlyFree){
+          const baseDate = dtVal ? parseDatetimeLocalValueToDate(dtVal) : new Date();
+          const iso = baseDate.toISOString();
+          url = `${API_BASE}/conductores/?disponibles=1&fecha_hora=${encodeURIComponent(iso)}`;
+        }
+        const list = await fetchAll(url);
+        render(list);
+      }catch(e){
+        console.error(e);
+        $tblBody.innerHTML = `<tr><td colspan="5" class="muted" style="text-align:center;padding:28px;">Error cargando datos</td></tr>`;
+        $status.textContent = "Sin datos (error)";
+      }
+    }
+
+    // Eventos
+    $q.addEventListener("input",  loadConductores);
+    $dt.addEventListener("change", loadConductores);
+    $onlyFree.addEventListener("change", loadConductores);
+
+    // INIT
+    (async ()=>{
+      setDefaultDateTime();
+      await loadConductores();
     })();
   </script>
-  <script>
-    const token = localStorage.getItem("coord_token");
-    if (!token) {
-    window.location.href = "inicio_sesion.html";
-    }
 
-    // Al llamar a la API, envía el token:
-    fetch("https://enquiry-solar-logged-featuring.trycloudflare.com/api/solicitudes/", {
-    headers: {
-        "Accept": "application/json",
-        "Authorization": "Bearer " + token
-    }
-    });
-    </script>
-
-
-
-
-
-
+  <!-- Script global (sólo maneja el menú; sin lógica de tema) -->
   <script src="/js/coordinador.js"></script>
 </body>
 </html>

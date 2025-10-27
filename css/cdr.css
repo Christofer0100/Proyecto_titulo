@@ -1,13 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
+/* =====================================================================================
+   SISTEMA DE TEMA (CLARO/OSCURO) con data-theme en <html>
+   - Por defecto: tema claro (variables base).
+   - Para oscuro: <html data-theme="dark"> (lo seteamos con JS).
+   - Se mantiene .dark-mode-variables para compatibilidad hacia atrás (no es obligatorio).
+===================================================================================== */
+
 :root{
+    /* === Paleta base (CLARO) === */
     --color-fondo: #ffffff;
     --bg: #f7f8fb;
     --color-primary: #6C9BCF;
     --color-danger: #FF0060;
     --color-success: #1B9C85;
     --color-warning: #F7D060;
-    --color-white: #fff;
+    --color-white: #fff;            /* "card" en claro */
+    --card: var(--color-white);     /* alias para consistencia entre páginas */
     --color-info-dark: #7d8da1;
     --color-dark: #363949;
     --color-light: rgba(132, 139, 200, 0.18);
@@ -46,17 +55,18 @@
     --assign-border-hover:#bfe2c2;
 }
 
-.dark-mode-variables{
+/* Tema OSCURO al usar <html data-theme="dark"> */
+:root[data-theme="dark"]{
     --color-fondo: #181a1e;
     --color-background: #181a1e;
-    --color-white: #202528;
+    --color-white: #202528;   /* "card" en oscuro */
+    --card: #12161c;          /* alias para consistencia entre páginas */
     --color-dark: #edeffd;
     --color-dark-variant: #a3bdcc;
     --color-light: rgba(0, 0, 0, 0.4);
     --box-shadow: 0 2rem 3rem var(--color-light);
     --text: #ffffff;
     --bg:#0b0d10;
-    --card:#12161c;
     --muted:#ffffff;
     --buscar: #9ca3af;
     --border-strong:#374151;
@@ -80,6 +90,67 @@
     --assign-bg-hover:    #223522;
     --assign-border-hover:#30533a;
 }
+
+/* (Compatibilidad) Si en alguna página se agrega esta clase al body/html,
+   replica las variables del tema oscuro. */
+.dark-mode-variables{
+    --color-fondo: #181a1e;
+    --color-background: #181a1e;
+    --color-white: #202528;
+    --card: #12161c;
+    --color-dark: #edeffd;
+    --color-dark-variant: #a3bdcc;
+    --color-light: rgba(0, 0, 0, 0.4);
+    --box-shadow: 0 2rem 3rem var(--color-light);
+    --text: #ffffff;
+    --bg:#0b0d10;
+    --muted:#ffffff;
+    --buscar: #9ca3af;
+    --border-strong:#374151;
+    --primary:#000000;
+    --primary-600:#000000;
+    --primary-50:#0b1220;
+    --row:#151a21;
+    --row-alt:#11161d;
+    --row-hover:#1a212a;
+    --badge-bg:#17202a;
+
+    --edit-bg:            #3a1f24;
+    --edit-border:        #5a2b33;
+    --edit-fg:            #ffb3ba;
+    --edit-bg-hover:      #4a262d;
+    --edit-border-hover:  #6a3640;
+
+    --assign-bg:          #1a2a1a;
+    --assign-border:      #27402a;
+    --assign-fg:          #bfe2c2;
+    --assign-bg-hover:    #223522;
+    --assign-border-hover:#30533a;
+}
+
+/* ====== BASE según variables del tema ====== */
+html{ font-size: 14px; }
+body{
+    width: 100vw; height: 100vh;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.88rem; user-select: none; overflow-x: hidden;
+    color: var(--color-dark); 
+    background-color: var(--color-background);
+}
+a{ color: var(--color-dark); }
+img{ display:block; width:100%; object-fit:cover; }
+h1{ font-weight:800; font-size:1.8rem; }
+h2{ font-weight:600; font-size:1.4rem; }
+h3{ font-weight:500; font-size:0.87rem; }
+small{ font-size:0.76rem; }
+p{ color: var(--color-dark-variant); }
+b{ color: var(--color-dark); }
+.text-muted{ color: var(--color-info-dark); }
+.primary{ color: var(--color-primary); }
+.secondary{ color:#000; }
+.danger{ color: var(--color-danger); }
+.success{ color: var(--color-success); }
+.warning{ color: var(--color-warning); }
 
 /* ====== BARRA Y BUSCADOR ====== */
 .toolbar{
@@ -135,7 +206,6 @@ th:last-child, td:last-child{ width: 120px; }
 .btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
 
 /* === Botón "Editar" (ASIGNADA) — estilo rojo claro === */
-/* [BOTÓN ROJO EDITAR] */
 .btn-edit{
     background: var(--edit-bg);
     color: var(--edit-fg);
@@ -147,7 +217,6 @@ th:last-child, td:last-child{ width: 120px; }
 }
 
 /* === Botón "Asignar" (NUEVA) — estilo armónico con Editar === */
-/* [BOTÓN VERDE ASIGNAR] */
 .btn-assign{
     background: var(--assign-bg);
     color: var(--assign-fg);
@@ -156,6 +225,22 @@ th:last-child, td:last-child{ width: 120px; }
 .btn-assign:hover{
     background: var(--assign-bg-hover);
     border-color: var(--assign-border-hover);
+}
+
+/* ====== INPUT SOLO LECTURA (para fecha/hora bloqueada del modal) ====== */
+.input-readonly{
+    background: var(--badge-bg);
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    border-radius: 12px;
+    padding: 10px 12px;
+    width: 100%;
+    cursor: not-allowed;
+    opacity: .9;
+}
+.input-readonly::-webkit-calendar-picker-indicator{
+    filter: grayscale(100%);
+    cursor: not-allowed;
 }
 
 /* ====== DIALOG / MODAL ====== */
@@ -176,6 +261,7 @@ dialog{
 select, input[type="datetime-local"]{
     width:100%; padding:10px 1px; border:1px solid var(--border-strong); border-radius:10px;
     outline:none; transition:border-color .2s, box-shadow .2s;
+    background: transparent; color: var(--text);
 }
 select:focus, input[type="datetime-local"]:focus{
     border-color: var(--color-primary);
@@ -183,28 +269,6 @@ select:focus, input[type="datetime-local"]:focus{
 }
 
 /* ====== LAYOUT GENERAL ====== */
-html{ font-size: 14px; }
-body{
-    width: 100vw; height: 100vh;
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.88rem; user-select: none; overflow-x: hidden;
-    color: var(--color-dark); background-color: var(--color-background);
-}
-a{ color: var(--color-dark); }
-img{ display:block; width:100%; object-fit:cover; }
-h1{ font-weight:800; font-size:1.8rem; }
-h2{ font-weight:600; font-size:1.4rem; }
-h3{ font-weight:500; font-size:0.87rem; }
-small{ font-size:0.76rem; }
-p{ color: var(--color-dark-variant); }
-b{ color: var(--color-dark); }
-.text-muted{ color: var(--color-info-dark); }
-.primary{ color: var(--color-primary); }
-.secondary{ color:#000; }
-.danger{ color: var(--color-danger); }
-.success{ color: var(--color-success); }
-.warning{ color: var(--color-warning); }
-
 .container{ display:grid; width:96%; margin:0 auto; gap:1.8rem; grid-template-columns: 12rem minmax(0,1fr) 12rem; }
 aside{ height:100vh; }
 aside .toggle{ display:flex; align-items:center; justify-content:space-between; margin-top:1.4rem; }
@@ -232,8 +296,6 @@ aside .sidebar .message-count{ background-color: var(--color-danger); padding:2p
 
 main{ margin-top:1.4rem; }
 
-/* ¡OJO! Se eliminó el bloque .analyse para esta página */
-
 /* ====== TABLA ====== */
 main .recent-orders{ margin-top: 1.3rem; }
 main .recent-orders table{
@@ -246,6 +308,7 @@ main table tbody td{ height:2.8rem; border-bottom:1px solid var(--color-light); 
 main table tbody tr:last-child td{ border:none; }
 main .recent-orders a{ text-align:center; display:block; margin:1rem auto; color: var(--color-primary); }
 
+/* ====== TOP NAV / TOGGLE TEMA ====== */
 .right-section{ margin-top:3rem; }
 .right-section .nav{ display:flex; justify-content:end; gap:2rem; }
 .right-section .nav button{ display:none; }
@@ -253,8 +316,14 @@ main .recent-orders a{ text-align:center; display:block; margin:1rem auto; color
     background-color: var(--color-light); display:flex; justify-content:space-between; align-items:center;
     height:1.6rem; width:4.2rem; cursor:pointer; border-radius: var(--border-radius-1);
 }
-.right-section .dark-mode span{ font-size:1.2rem; width:50%; height:100%; display:flex; align-items:center; justify-content:center; }
-.right-section .dark-mode span.active{ background-color: var(--color-primary); color:#fff; border-radius: var(--border-radius-1); }
+.right-section .dark-mode span{ 
+    font-size:1.2rem; width:50%; height:100%; display:flex; align-items:center; justify-content:center;
+    opacity:.55; transition: opacity .15s ease;
+}
+.right-section .dark-mode span.active{ 
+    background-color: var(--color-primary); color:#fff; border-radius: var(--border-radius-1);
+    opacity:1;
+}
 
 /* ====== RESPONSIVE ====== */
 @media screen and (max-width: 1200px){

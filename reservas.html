@@ -3,9 +3,17 @@
 <head>
   <meta charset="utf-8" />
   <title>Reservas</title>
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
   <link rel="stylesheet" href="css/reserva.css">
+
+  <!-- Evita FOUC del tema: aplica clase antes del primer repintado -->
+  <script>
+    (function(){
+      var th = localStorage.getItem('theme') || 'light';
+      if (th === 'dark') document.documentElement.classList.add('preload-dark');
+    })();
+  </script>
 </head>
 
 <body>
@@ -13,7 +21,7 @@
     <aside>
       <div class="toggle">
         <div class="logo">
-          <img src="imagenes/3.jpg" alt="">
+          <img src="imagenes/3.jpg" alt="logo">
           <h2><span class="primary">ATP</span></h2>
         </div>
         <div class="close" id="close-btn">
@@ -71,10 +79,13 @@
     <div class="right-section">
       <div class="nav">
         <button id="menu-btn"><span class="material-icons-sharp">menu</span></button>
-        <div class="dark-mode">
-          <span class="material-icons-sharp active">light_mode</span>
-          <span class="material-icons-sharp">dark_mode</span>
+
+        <!-- Toggle de tema unificado -->
+        <div id="theme-toggle" class="dark-mode" role="button" aria-label="Cambiar tema">
+          <span class="material-icons-sharp" data-theme-target="light">light_mode</span>
+          <span class="material-icons-sharp" data-theme-target="dark">dark_mode</span>
         </div>
+
         <div class="profile">
           <div class="info">
             <p>Hola, <b id="coordinadorNombre">—</b></p>
@@ -87,13 +98,38 @@
 
   <script>
     /* ====== CONFIG ====== */
-    const API_BASE = 'https://enquiry-solar-logged-featuring.trycloudflare.com/api'; // mismo que en Solicitudes
+    const API_BASE = 'https://bulletin-spirits-what-gmt.trycloudflare.com/api';
     const TOKEN = localStorage.getItem('coord_token') || '';
+
+    /* ====== THEME (persistente y sincronizado con otras vistas) ====== */
+    (function themeInit(){
+      const rootPreload = document.documentElement;
+      const toggle = document.getElementById('theme-toggle');
+      const sun  = toggle.querySelector('[data-theme-target="light"]');
+      const moon = toggle.querySelector('[data-theme-target="dark"]');
+
+      function apply(theme){
+        document.body.classList.toggle('dark-mode-variables', theme === 'dark');
+        sun.classList.toggle('active', theme === 'light');
+        moon.classList.toggle('active', theme === 'dark');
+        localStorage.setItem('theme', theme);
+      }
+      apply(localStorage.getItem('theme') || 'light');
+
+      // Limpia clase de pre-carga si existía
+      rootPreload.classList.remove('preload-dark');
+
+      toggle.addEventListener('click', () => {
+        const next = document.body.classList.contains('dark-mode-variables') ? 'light' : 'dark';
+        apply(next);
+      });
+    })();
 
     /* ====== HELPERS ====== */
     function headersJSON() {
       const h = { 'Accept': 'application/json' };
-      if (TOKEN) h['Authorization'] = 'Token ' + TOKEN; // nuestro backend usa "Token <clave>"
+      // si tu backend espera "Token <clave>" déjalo así; si es Bearer, cambia aquí
+      if (TOKEN) h['Authorization'] = 'Token ' + TOKEN;
       return h;
     }
 
@@ -118,9 +154,8 @@
 
     function fmtDate(d) {
       if (!d) return '';
-      try {
-        return new Date(d).toLocaleString('es-CL', { dateStyle: 'medium', timeStyle: 'short' });
-      } catch { return d; }
+      const t = new Date(d);
+      return isNaN(+t) ? d : t.toLocaleString('es-CL', { dateStyle: 'medium', timeStyle: 'short' });
     }
 
     function safeTxt(v, def='-') {
@@ -177,7 +212,7 @@
 
     (function pintarDesdeCache() {
       const cached = localStorage.getItem('coord_name');
-      if (cached) pintarCoordinador(cached); // muestra instantáneo para evitar parpadeo
+      if (cached) pintarCoordinador(cached);
     })();
 
     async function cargarCoordinador(){
@@ -199,15 +234,12 @@
                          || item.nombre || item.user || null;
             if (nombre) {
               pintarCoordinador(nombre);
-              localStorage.setItem('coord_name', nombre); // cache fresco
+              localStorage.setItem('coord_name', nombre);
               return;
             }
           }
-        } catch (_) {
-          // continuar con el siguiente endpoint
-        }
+        } catch (_) {}
       }
-      // Si no hubo éxito, dejamos "—" o el cache previo
     }
 
     // Init
@@ -216,6 +248,7 @@
     })();
   </script>
 
+  <!-- JS global (menú lateral y atajos del layout) -->
   <script src="/js/coordinador.js"></script>
 </body>
 </html>

@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ATP · Modelo Predictivo</title>
+
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
   <link rel="stylesheet" href="/css/prediccion.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
-  <!-- Overrides mínimos para que las barras sean idénticas a “Solicitudes” -->
   <style>
     .pred-header{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:8px}
     .barra-externa{width:100%;height:12px;border-radius:10px;background:var(--badge-bg);border:1px solid var(--border-strong);overflow:hidden}
@@ -19,6 +19,22 @@
     .badge-modelo.badge-azul{background:#e8f1ff;border:1px solid #cfe0ff}
     .badge-modelo.badge-amarillo{background:#fff8e6;border:1px solid #ffe1a8}
   </style>
+
+  <!-- Pre-sync: aplica el tema guardado (o el del SO) antes del render -->
+  <script>
+    (function(){
+      try{
+        var saved = localStorage.getItem('theme');
+        var prefers = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var isDark = saved ? saved === 'dark' : prefers;
+        if (isDark) {
+          document.addEventListener('DOMContentLoaded', function(){
+            document.body.classList.add('dark-mode-variables');
+          });
+        }
+      }catch(_){}
+    })();
+  </script>
 </head>
 <body>
 
@@ -89,11 +105,7 @@
             <label>Hora seleccionada</label>
             <input type="range" id="rngHora" min="0" max="23" step="1" value="14" class="range-modelo" />
             <div class="hora-ticks">
-              <small>00:00</small>
-              <small>06:00</small>
-              <small>12:00</small>
-              <small>18:00</small>
-              <small>23:00</small>
+              <small>00:00</small><small>06:00</small><small>12:00</small><small>18:00</small><small>23:00</small>
             </div>
           </div>
 
@@ -163,9 +175,7 @@
 
     <div class="right-section">
       <div class="nav">
-        <button id="menu-btn">
-          <span class="material-icons-sharp">menu</span>
-        </button>
+        <button id="menu-btn"><span class="material-icons-sharp">menu</span></button>
         <div class="dark-mode">
           <span class="material-icons-sharp active">light_mode</span>
           <span class="material-icons-sharp">dark_mode</span>
@@ -196,7 +206,8 @@
     const kpiDestino = document.getElementById('kpiDestino');
 
     const origenLabel = document.getElementById('origenLabel');
-    const destinoLabel = document.getElementById('destinoLabel');
+    theDestinoLabel = document.getElementById('destinoLabel');
+    const destinoLabel = theDestinoLabel; // alias para compatibilidad
     const origenPct = document.getElementById('origenPct');
     const destinoPct = document.getElementById('destinoPct');
     const origenBar = document.getElementById('origenBar');
@@ -358,9 +369,9 @@
     calcularPuntual();
   </script>
 
-  <!-- Nombre real del coordinador (igual que en otras páginas) -->
+  <!-- Nombre real del coordinador -->
   <script>
-    const API_BASE = 'https://reflected-slim-seen-volvo.trycloudflare.com/api';
+    const API_BASE = 'https://bulletin-spirits-what-gmt.trycloudflare.com/api';
     const TOKEN = localStorage.getItem('coord_token') || '';
     function headersJSON(){
       const h = { 'Accept': 'application/json' };
@@ -397,6 +408,51 @@
     cargarCoordinador();
   </script>
 
+  <!-- Toggle de tema AUTÓNOMO (no depende de coordinador.js) -->
+  <script>
+    (function(){
+      function syncIcons(isDark){
+        const dm = document.querySelector('.dark-mode');
+        if (!dm) return;
+        const icons = dm.querySelectorAll('span.material-icons-sharp');
+        const sun = icons[0], moon = icons[1];
+        if (sun && moon){
+          sun.classList.toggle('active', !isDark);
+          moon.classList.toggle('active',  isDark);
+        }
+      }
+
+      function applyTheme(isDark){
+        document.body.classList.toggle('dark-mode-variables', isDark);
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        syncIcons(isDark);
+      }
+
+      // Estado inicial
+      try{
+        const saved = localStorage.getItem('theme');
+        const prefers = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isDark = saved ? saved === 'dark' : prefers;
+        applyTheme(isDark);
+      }catch(_){}
+
+      // Click handler
+      document.addEventListener('click', function(ev){
+        const dm = ev.target.closest('.dark-mode');
+        if (!dm) return;
+        const isDarkNow = document.body.classList.contains('dark-mode-variables');
+        applyTheme(!isDarkNow);
+      });
+
+      // Si cambia la preferencia del SO y el usuario no fijó manualmente, puedes escuchar:
+      // window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+      //   const saved = localStorage.getItem('theme');
+      //   if (!saved) applyTheme(e.matches);
+      // });
+    })();
+  </script>
+
+  <!-- Puedes mantenerlo si necesitas el menú lateral, pero ya NO dependemos de su toggle de tema -->
   <script src="/js/coordinador.js"></script>
 </body>
 </html>

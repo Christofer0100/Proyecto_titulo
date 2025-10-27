@@ -3,52 +3,61 @@
 <head>
   <meta charset="utf-8" />
   <title>Tenistas</title>
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
   <link rel="stylesheet" href="css/tenista.css">
+
+  <!-- Preload del tema: evita parpadeo -->
+  <script>
+    (function(){
+      try {
+        const saved = localStorage.getItem('theme'); // "dark" | "light" | null
+        if (saved === 'dark') {
+          document.documentElement.classList.add('preload-dark'); // CSS ya lo soporta
+          document.addEventListener('DOMContentLoaded', () => {
+            document.documentElement.classList.remove('preload-dark');
+          });
+        }
+      } catch (_) {}
+    })();
+  </script>
 </head>
 
 <body>
   <div class="container">
+    <!-- SIDEBAR -->
     <aside>
       <div class="toggle">
         <div class="logo">
           <img src="imagenes/3.jpg" alt="">
           <h2><span class="primary">ATP</span></h2>
         </div>
-        <div class="close" id="close-btn">
-          <span class="material-icons-sharp">close</span>
-        </div>
+        <div class="close" id="close-btn"><span class="material-icons-sharp">close</span></div>
       </div>
 
       <div class="sidebar">
         <a href="/Api_Modelo_Predictivo/frontend/modelo.html">
-          <span class="material-icons-sharp">dashboard</span>
-          <h3>Predicción</h3>
+          <span class="material-icons-sharp">dashboard</span><h3>Predicción</h3>
         </a>
         <a href="/tenistas.html" class="active">
-          <span class="material-icons-sharp">person_outline</span>
-          <h3>Tenista</h3>
+          <span class="material-icons-sharp">person_outline</span><h3>Tenista</h3>
         </a>
         <a href="/conductor.html">
-          <span class="material-icons-sharp">person_outline</span>
-          <h3>Conductores</h3>
+          <span class="material-icons-sharp">person_outline</span><h3>Conductores</h3>
         </a>
         <a href="/prueba2.html">
-          <span class="material-icons-sharp">insights</span>
-          <h3>Solicitudes</h3>
+          <span class="material-icons-sharp">insights</span><h3>Solicitudes</h3>
         </a>
         <a href="/reservas.html">
-          <span class="material-icons-sharp">receipt_long</span>
-          <h3>Reservas</h3>
+          <span class="material-icons-sharp">receipt_long</span><h3>Reservas</h3>
         </a>
         <a href="/inicio_sesion.html">
-          <span class="material-icons-sharp">logout</span>
-          <h3>Cerrar Sesión</h3>
+          <span class="material-icons-sharp">logout</span><h3>Cerrar Sesión</h3>
         </a>
       </div>
     </aside>
 
+    <!-- MAIN -->
     <main>
       <h1>Tenistas</h1>
 
@@ -74,12 +83,13 @@
       </div>
     </main>
 
+    <!-- HEADER DERECHO -->
     <div class="right-section">
       <div class="nav">
         <button id="menu-btn"><span class="material-icons-sharp">menu</span></button>
-        <div class="dark-mode">
-          <span class="material-icons-sharp active">light_mode</span>
-          <span class="material-icons-sharp">dark_mode</span>
+        <div id="theme-toggle" class="dark-mode" role="button" aria-label="Cambiar tema">
+          <span class="material-icons-sharp" data-theme="light">light_mode</span>
+          <span class="material-icons-sharp" data-theme="dark">dark_mode</span>
         </div>
         <div class="profile">
           <div class="info">
@@ -91,29 +101,25 @@
     </div>
   </div>
 
+  <!-- JS de página (independiente y mínimo) -->
   <script>
-    /* ====== CONFIG ====== */
-    const API_BASE = "https://enquiry-solar-logged-featuring.trycloudflare.com/api"; // mismo host que el resto
+    /* === Config API === */
+    const API_BASE = "https://bulletin-spirits-what-gmt.trycloudflare.com/api";
     const TOKEN    = localStorage.getItem("coord_token") || "";
 
-    /* ====== HELPERS ====== */
     function headersJSON(method){
       const h = { "Accept": "application/json" };
       if (method) h["Content-Type"] = "application/json";
-      if (TOKEN)  h["Authorization"] = "Token " + TOKEN;   // <- Token, no Bearer
+      if (TOKEN)  h["Authorization"] = "Token " + TOKEN; // DRF TokenAuth
       return h;
     }
-
     async function fetchJSON(url, opts = {}) {
       const r = await fetch(url, { ...opts, headers: headersJSON(opts.method) });
       if (!r.ok) throw new Error("HTTP " + r.status);
       return r.json();
     }
-
-    // Soporte paginación DRF (results/next) o array plano
     async function fetchAll(url){
-      const out = [];
-      let next = url;
+      const out = []; let next = url;
       while (next) {
         const data = await fetchJSON(next);
         if (Array.isArray(data)) { out.push(...data); break; }
@@ -123,46 +129,31 @@
       return out;
     }
 
-    function safe(v, def=""){ return (v===null||v===undefined) ? def : v; }
-
-    /* ====== TENISTAS ====== */
+    /* === Render tabla === */
+    const safe = (v, d="") => (v==null ? d : v);
     function renderTenistas(list){
       const $tbody = document.getElementById("tbody-tenistas");
       if(!list.length){
         $tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No hay tenistas</td></tr>`;
         return;
       }
-      const rows = list.map(t => `
+      $tbody.innerHTML = list.map(t => `
         <tr>
-          <td>${safe(t.id,"")}</td>
-          <td>${safe(t.nombre,"")}</td>
-          <td>${safe(t.apellido,"")}</td>
-          <td>${safe(t.correo,"")}</td>
-          <td>${safe(t.numero,"")}</td>
+          <td>${safe(t.id)}</td>
+          <td>${safe(t.nombre)}</td>
+          <td>${safe(t.apellido)}</td>
+          <td>${safe(t.correo)}</td>
+          <td>${safe(t.numero)}</td>
         </tr>
       `).join("");
-      $tbody.innerHTML = rows;
     }
 
-    async function loadTenistas(){
-      const $tbody = document.getElementById("tbody-tenistas");
-      $tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Cargando…</td></tr>`;
-      try{
-        const tenistas = await fetchAll(`${API_BASE}/tenistas/`);
-        renderTenistas(tenistas);
-      }catch(e){
-        console.error(e);
-        $tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:red;">Error cargando tenistas</td></tr>`;
-      }
-    }
-
-    /* ====== NOMBRE DEL COORDINADOR ====== */
+    /* === Nombre coordinador con caché === */
     (function pintarDesdeCache(){
       const cached = localStorage.getItem('coord_name');
       const el = document.getElementById('coordinadorNombre');
-      el.textContent = cached || '—';
+      if (el) el.textContent = cached || '—';
     })();
-
     async function cargarCoordinador(){
       const nameEl = document.getElementById('coordinadorNombre');
       const candidates = [
@@ -180,24 +171,69 @@
 
           if (item) {
             const nombre = [item.nombre, item.apellido].filter(Boolean).join(' ')
-                          || item.nombre || item.user || null;
+                        || item.nombre || item.user || null;
             if (nombre) {
               nameEl.textContent = nombre;
               localStorage.setItem('coord_name', nombre);
               return;
             }
           }
-        }catch(_){ /* probar el siguiente endpoint */ }
+        }catch(_){ /* sigue probando */ }
       }
-      // si ninguno funciona, deja el cache o "—"
     }
 
-    /* ====== INIT ====== */
+    /* === Toggle de tema local a esta vista === */
+    (function initThemeToggle(){
+      const rootBody = document.body;
+      const toggle = document.getElementById('theme-toggle');
+      const spans = toggle ? toggle.querySelectorAll('span.material-icons-sharp') : [];
+
+      // Aplica estado inicial desde localStorage
+      const saved = localStorage.getItem('theme'); // "dark" | "light"
+      if (saved === 'dark') rootBody.classList.add('dark-mode-variables');
+      else rootBody.classList.remove('dark-mode-variables');
+
+      // Marca icono activo
+      function markActive(){
+        const isDark = rootBody.classList.contains('dark-mode-variables');
+        spans.forEach(s => s.classList.remove('active'));
+        const target = toggle.querySelector(`span[data-theme="${isDark ? 'dark' : 'light'}"]`);
+        if (target) target.classList.add('active');
+      }
+      markActive();
+
+      // Click: alterna
+      if (toggle) {
+        toggle.addEventListener('click', () => {
+          rootBody.classList.toggle('dark-mode-variables');
+          const isDark = rootBody.classList.contains('dark-mode-variables');
+          try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch(_){}
+          markActive();
+        });
+      }
+    })();
+
+    /* === Side menu (opcional) === */
+    (function initMenu(){
+      const sideMenu = document.querySelector('aside');
+      const menuBtn  = document.getElementById('menu-btn');
+      const closeBtn = document.getElementById('close-btn');
+      if (menuBtn)  menuBtn.addEventListener('click', () => sideMenu.style.display = 'block');
+      if (closeBtn) closeBtn.addEventListener('click', () => sideMenu.style.display = 'none');
+    })();
+
+    /* === Init data === */
     (async () => {
-      await Promise.all([cargarCoordinador(), loadTenistas()]);
+      try {
+        const tenistas = await fetchAll(`${API_BASE}/tenistas/`);
+        renderTenistas(tenistas);
+        cargarCoordinador();
+      } catch (e) {
+        console.error(e);
+        document.getElementById("tbody-tenistas").innerHTML =
+          `<tr><td colspan="5" style="text-align:center;color:red;">Error cargando tenistas</td></tr>`;
+      }
     })();
   </script>
-
-  <script src="/js/coordinador.js"></script>
 </body>
 </html>

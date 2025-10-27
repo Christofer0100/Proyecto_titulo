@@ -10,6 +10,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 import logging
 import json
+from datetime import datetime, timedelta  # <- NUEVO
 
 from .models import (
     Coordinador, CoordinadorToken, Conductor, Tenista, Origen, Destino,
@@ -24,6 +25,27 @@ from .serializers import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+# ---------- Utilidades ----------
+def _parse_iso_dt(value: str):
+    """
+    Convierte string ISO 8601 a datetime aware (zona actual si es naive).
+    Acepta 'Z' al final como UTC.
+    """
+    if not value:
+        return None
+    try:
+        s = value.strip()
+        if s.endswith("Z"):
+            dt = datetime.fromisoformat(s.replace("Z", "+00:00"))
+        else:
+            dt = datetime.fromisoformat(s)
+        if timezone.is_naive(dt):
+            dt = timezone.make_aware(dt, timezone.get_current_timezone())
+        return dt
+    except Exception:
+        return None
 
 
 # ---------- Base ----------
@@ -44,7 +66,9 @@ class CoordinadorViewSet(BaseViewSet):
 
 class ConductorViewSet(BaseViewSet):
     """
-    GET /api/conductores/?disponibles=1  -> excluye conductores ocupados (ASIGNADA, EN_CURSO)
+    GET /api/conductores/?disponibles=1[&fecha_hora=ISO]
+      -> excluye conductores ocupados (ASIGNADA, EN_CURSO) dentro de ±1h
+         respecto de 'fecha_hora' o 'now()' si no se envía.
     """
     queryset = Conductor.objects.all().order_by("-id")
     serializer_class = ConductorSerializer
@@ -58,10 +82,20 @@ class ConductorViewSet(BaseViewSet):
 
         disponibles = self.request.query_params.get("disponibles")
         if str(disponibles) == "1":
-            ocupados_ids = (Reserva.objects
-                            .filter(estado__in=[ReservaEstado.ASIGNADA, ReservaEstado.EN_CURSO])
-                            .values_list("conductor_id", flat=True))
+            fecha_param = self.request.query_params.get("fecha_hora")
+            fecha = _parse_iso_dt(fecha_param) or timezone.now()
+
+            window_start = fecha - timedelta(hours=1)
+            window_end = fecha + timedelta(hours=1)
+
+            ocupados_ids = (
+                Reserva.objects.filter(
+                    estado__in=[ReservaEstado.ASIGNADA, ReservaEstado.EN_CURSO],
+                    fecha_hora_agendada__range=(window_start, window_end),
+                ).values_list("conductor_id", flat=True)
+            )
             qs = qs.exclude(id__in=ocupados_ids)
+
         return qs
 
 
@@ -147,6 +181,7 @@ class ConductorListAPI(generics.ListAPIView):
 
 # ---------- Auth / Tokens ----------
 def _emit_token(coord: Coordinador) -> CoordinadorToken:
+    # Desactiva tokens vencidos del coordinador
     CoordinadorToken.objects.filter(
         coordinador=coord, is_active=True, expires_at__lt=timezone.now()
     ).update(is_active=False)
@@ -202,9 +237,11 @@ def asignar_conductor_a_solicitud(request, pk: int):
     Body esperado (JSON):
     {
       "conductor_id": 3,
-      "fecha_hora_agendada": "2025-09-07T15:30:00Z",  (opcional)
+      "fecha_hora_agendada": "2025-09-07T15:30:00Z",  (opcional pero recomendado)
       "coordinador_id": 1                             (opcional)
     }
+    Regla: bloquear solo si el conductor tiene otra reserva ASIGNADA/EN_CURSO
+           en la ventana de ±1 hora de 'fecha_hora_agendada' (o now()).
     """
     data = request.data or {}
     conductor_id = data.get("conductor_id")
@@ -221,15 +258,27 @@ def asignar_conductor_a_solicitud(request, pk: int):
     except Conductor.DoesNotExist:
         return Response({"ok": False, "error": "Conductor no válido o inactivo"}, status=400)
 
-    # Evitar doble asignación
-    if Reserva.objects.filter(
+    # Determinar la fecha/hora a usar para la validación y la reserva
+    fecha_param = data.get("fecha_hora_agendada")
+    fecha = _parse_iso_dt(fecha_param) or timezone.now()
+
+    # Ventana de ±1 hora
+    window_start = fecha - timedelta(hours=1)
+    window_end = fecha + timedelta(hours=1)
+
+    # Bloquear solo si hay otra reserva del mismo conductor en esa ventana
+    conflicto = Reserva.objects.filter(
         conductor_id=conductor.id,
-        estado__in=[ReservaEstado.ASIGNADA, ReservaEstado.EN_CURSO]
-    ).exists():
-        return Response({"ok": False, "error": "El conductor ya está asignado"}, status=409)
+        estado__in=[ReservaEstado.ASIGNADA, ReservaEstado.EN_CURSO],
+        fecha_hora_agendada__range=(window_start, window_end),
+    ).exists()
+    if conflicto:
+        return Response(
+            {"ok": False, "error": "El conductor tiene otra reserva en la última/próxima hora"},
+            status=409
+        )
 
-    fecha = data.get("fecha_hora_agendada") or timezone.now().isoformat()
-
+    # Crear o actualizar la reserva para esta solicitud
     reserva, _created = Reserva.objects.get_or_create(
         solicitud=sol,
         defaults={

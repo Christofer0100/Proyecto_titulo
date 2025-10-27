@@ -32,3 +32,7 @@ Navegador:
 
 
 python manage.py makemigrations app
+
+py manage.py runserver 8001
+
+cloudflared tunnel --url http://localhost:8001/
