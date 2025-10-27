@@ -29,3 +29,6 @@ consultar en verify_probabilities:
 Navegador:
    http://127.0.0.1:8000/docs
    http://127.0.0.1:5500/solicitudes.html
+
+
+python manage.py makemigrations app
