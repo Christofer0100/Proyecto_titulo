@@ -339,3 +339,9 @@ select:focus, input[type="datetime-local"]:focus{ border-color:var(--primary); b
   }
   .right-section .nav button span{ font-size:2rem; }
 }
+#chart-wrapper {
+  width: 100%;
+  height: 420px;      /* ← altura real y estable */
+  position: relative; /* ← Chart.js requiere esto */
+  overflow: hidden;
+}

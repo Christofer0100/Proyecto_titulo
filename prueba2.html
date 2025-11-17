@@ -169,35 +169,50 @@
     </div>
   </div>
 
-  <!-- Modal asignación -->
-  <dialog id="dlg-asignacion" aria-labelledby="dlg-title">
-    <form method="dialog">
-      <div class="modal-header">
-        <strong id="dlg-title">Asignar conductor</strong>
-        <button class="btn-bla" value="cancel" aria-label="Cerrar">✕</button>
+<!-- Modal asignación (REESTILIZADO PARA QUE COINCIDA CON EL RESTO DE LA PÁGINA) -->
+<dialog id="dlg-asignacion" aria-labelledby="dlg-title">
+  <form method="dialog" class="modal-ctp">
+
+    <!-- HEADER -->
+    <div class="modal-header-ctp">
+      <strong id="dlg-title">Asignar conductor</strong>
+
+      <button class="close-icon-ctp" value="cancel" aria-label="Cerrar">
+        <span class="material-icons-sharp">close</span>
+      </button>
+    </div>
+
+    <!-- BODY -->
+    <div class="modal-body-ctp">
+      <div class="linea-sol">
+        <span class="muted">Solicitud:</span>
+        <span id="dlg-sol-info" class="pill"></span>
       </div>
-      <div class="modal-body">
-        <div><span class="muted">Solicitud:</span> <span id="dlg-sol-info" class="pill"></span></div>
-        <label>
-          <span class="muted">Conductor</span>
-          <select id="sel-conductor"></select>
-        </label>
-        <label>
-          <span class="muted">Fecha y hora agendada</span>
-          <input id="dt-agenda" type="datetime-local" class="input-readonly" disabled />
-          <small class="muted-help">Definida por la solicitud. No modificable.</small>
-        </label>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-bla" value="cancel">Cancelar</button>
-        <button id="btn-confirm" class="btn secondary" value="confirm">Asignar</button>
-      </div>
-    </form>
-  </dialog>
+
+      <label class="lbl-ctp">
+        <span class="muted">Conductor</span>
+        <select id="sel-conductor" class="input-ctp"></select>
+      </label>
+
+      <label class="lbl-ctp">
+        <span class="muted">Fecha y hora agendada</span>
+        <input id="dt-agenda" type="datetime-local" class="input-readonly" disabled />
+        <small class="muted-help">Definida por la solicitud. No modificable.</small>
+      </label>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="modal-footer-ctp">
+      <button class="btn-bla" value="cancel">Cancelar</button>
+      <button id="btn-confirm" class="btn btn-assign" value="confirm">Asignar</button>
+    </div>
+
+  </form>
+</dialog>
 
   <!-- ======= JS: SOLICITUDES ======= -->
   <script>
-    const API_BASE = 'https://gmc-teach-returning-removing.trycloudflare.com/api';
+    const API_BASE = 'https://soundtrack-discount-frozen-obtaining.trycloudflare.com/api';
     const TOKEN = '';
 
     const $tbody = document.getElementById('tbody-solicitudes');
