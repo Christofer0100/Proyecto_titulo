@@ -538,3 +538,11 @@ dialog::backdrop {
   max-width: 100%;
   box-sizing: border-box;
 }
+/* Limitar ancho del bloque de la barra */
+.fila-controles .campo:first-child {
+  max-width: 1700px;
+}
+/* Limitar el ancho del input de hora */
+#lblHora {
+  max-width: 120px;
+}
