@@ -1,4 +1,4 @@
-<!doctype html>
+<!doctype html> 
 <html lang="es">
 <head>
   <meta charset="utf-8" />
@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
   <link rel="stylesheet" href="css/reserva.css">
 
-  <!-- Evita FOUC del tema: aplica clase antes del primer repintado -->
+  <!-- Evita FOUC del tema -->
   <script>
     (function(){
       var th = localStorage.getItem('theme') || 'light';
@@ -21,8 +21,7 @@
     <aside>
       <div class="toggle">
         <div class="logo">
-          <img src="imagenes/3.jpg" alt="logo">
-          <h2><span class="primary">ATP</span></h2>
+          <img src="imagenes/ImagenChileOpen.png" alt="logo">
         </div>
         <div class="close" id="close-btn">
           <span class="material-icons-sharp">close</span>
@@ -80,7 +79,7 @@
       <div class="nav">
         <button id="menu-btn"><span class="material-icons-sharp">menu</span></button>
 
-        <!-- Toggle de tema unificado -->
+        <!-- Toggle de tema -->
         <div id="theme-toggle" class="dark-mode" role="button" aria-label="Cambiar tema">
           <span class="material-icons-sharp" data-theme-target="light">light_mode</span>
           <span class="material-icons-sharp" data-theme-target="dark">dark_mode</span>
@@ -98,10 +97,10 @@
 
   <script>
     /* ====== CONFIG ====== */
-    const API_BASE = 'https://gmc-teach-returning-removing.trycloudflare.com/api';
+    const API_BASE = 'https://occurrence-problems-consistent-franklin.trycloudflare.com/api';
     const TOKEN = localStorage.getItem('coord_token') || '';
 
-    /* ====== THEME (persistente y sincronizado con otras vistas) ====== */
+    /* ====== THEME ====== */
     (function themeInit(){
       const rootPreload = document.documentElement;
       const toggle = document.getElementById('theme-toggle');
@@ -116,7 +115,6 @@
       }
       apply(localStorage.getItem('theme') || 'light');
 
-      // Limpia clase de pre-carga si existía
       rootPreload.classList.remove('preload-dark');
 
       toggle.addEventListener('click', () => {
@@ -125,10 +123,9 @@
       });
     })();
 
-    /* ====== HELPERS ====== */
+    /* ===== HELPERS ===== */
     function headersJSON() {
       const h = { 'Accept': 'application/json' };
-      // si tu backend espera "Token <clave>" déjalo así; si es Bearer, cambia aquí
       if (TOKEN) h['Authorization'] = 'Token ' + TOKEN;
       return h;
     }
@@ -139,7 +136,6 @@
       return r.json();
     }
 
-    // Soporte a paginación estilo DRF (results/next) o array plano
     async function fetchAll(url) {
       const out = [];
       let next = url;
@@ -162,8 +158,10 @@
       return (v===null || v===undefined || v==='') ? def : v;
     }
 
+    /* ===== RENDER ===== */
     function renderReservas(rows) {
       const $tbody = document.getElementById('tbody-reservas');
+
       if (!rows.length) {
         $tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No hay reservas</td></tr>`;
         return;
@@ -177,7 +175,16 @@
         const conductorTxt = cNom || (r.conductor_nombre ?? r.conductor_id ?? '-');
 
         const estado = (r.estado || '').toString().toUpperCase() || '-';
-        const estadoBadge = `<span class="badge ${estado}">${estado}</span>`;
+
+        /* === CORRECCIÓN AQUÍ === */
+        const estadoTexto = {
+          'ASIGNADA': 'Asignada',
+          'EN_CURSO': 'En curso',
+          'COMPLETADA': 'Completada'
+        }[estado] || estado;
+
+        const estadoBadge = `<span class="badge ${estado}">${estadoTexto}</span>`;
+        /* ========================== */
 
         return `
           <tr>
@@ -204,7 +211,7 @@
       }
     }
 
-    // ====== Nombre real del coordinador con cache ======
+    /* ===== NOMBRE COORDINADOR ===== */
     function pintarCoordinador(nombre) {
       const el = document.getElementById('coordinadorNombre');
       if (nombre && el) el.textContent = nombre;
@@ -216,12 +223,12 @@
     })();
 
     async function cargarCoordinador(){
-      const candidates = [
+      const urls = [
         `${API_BASE}/coordinadores/me/`,
         `${API_BASE}/coordinadores/?activo=true`,
         `${API_BASE}/coordinadores/`
       ];
-      for (const url of candidates) {
+      for (const url of urls) {
         try {
           const data = await fetchJSON(url);
           let item = null;
@@ -230,8 +237,8 @@
           else if (data && typeof data === 'object') item = data;
 
           if (item) {
-            const nombre = [item.nombre, item.apellido].filter(Boolean).join(' ')
-                         || item.nombre || item.user || null;
+            const nombre = [item.nombre, item.apellido].filter(Boolean).join(' ') 
+                           || item.nombre || item.user || null;
             if (nombre) {
               pintarCoordinador(nombre);
               localStorage.setItem('coord_name', nombre);
@@ -242,13 +249,12 @@
       }
     }
 
-    // Init
+    /* ===== INIT ===== */
     (async () => {
       await Promise.all([cargarCoordinador(), loadReservas()]);
     })();
   </script>
 
-  <!-- JS global (menú lateral y atajos del layout) -->
   <script src="/js/coordinador.js"></script>
 </body>
 </html>

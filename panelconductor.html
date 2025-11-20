@@ -6,21 +6,68 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
   <link rel="stylesheet" href="css/cdr.css">
+
+  <style>
+    /* === Ajuste estético nuevo para botones === */
+    .btn-action {
+      padding: 8px 14px;
+      border-radius: 12px;
+      border: none;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-start {
+      background: #9cc84b; /* Verde suave como tu diseño */
+    }
+
+    .btn-start:hover {
+      background: #8ab63f;
+    }
+
+    .btn-end {
+      background: #d64545; /* Rojo elegante */
+    }
+
+    .btn-end:hover {
+      background: #c23a3a;
+    }
+
+    /* Colores para los estados */
+    .badge.ASIGNADA {
+      background: #1B9C85;
+      color: #fff;
+      border: none;
+    }
+
+    .badge.EN_CURSO {
+      background: #F7D060;
+      color: #000;
+      border: none;
+    }
+
+    .badge.COMPLETADA {
+      background: #4CAF50;  /* Verde diferente al de ASIGNADA */
+      color: #fff;
+      border: none;
+    }
+  </style>
 </head>
+
 <body>
   <div class="container">
     <aside>
       <div class="toggle">
         <div class="logo">
-          <img src="imagenes/3.jpg" alt="logo">
-          <h2><span class="primary">ATP</span></h2>
+          <img src="/imagenes/ImagenChileOpen.png" alt="logo">
         </div>
         <div class="close" id="close-btn"><span class="material-icons-sharp">close</span></div>
       </div>
 
       <div class="sidebar">
-        <a href="#"><span class="material-icons-sharp">person_outline</span><h3>Extra</h3></a>
-        <a href="#" class="active"><span class="material-icons-sharp">directions_car</span><h3>Mis Viajes</h3></a>
+        <a href="infoconductor.html"><span class="material-icons-sharp">person_outline</span><h3>Mi información</h3></a>
+        <a href="panelconductor.html" class="active"><span class="material-icons-sharp">directions_car</span><h3>Mis Viajes</h3></a>
         <a href="loginconductor.html" id="btn-logout"><span class="material-icons-sharp">logout</span><h3>Cerrar Sesión</h3></a>
       </div>
     </aside>
@@ -73,9 +120,7 @@
 
   <!-- ====== JS ====== -->
   <script>
-    /* -------------------------
-       1) Tema persistente
-    ------------------------- */
+    /* ------------------------- TEMA ---------------------------- */
     (function themeInit(){
       const toggle = document.getElementById('theme-toggle');
       const sun  = toggle.querySelector('[data-theme-target="light"]');
@@ -93,10 +138,8 @@
       });
     })();
 
-    /* -------------------------
-       2) Config/estado
-    ------------------------- */
-    const API_BASE = "https://gmc-teach-returning-removing.trycloudflare.com/api";
+    /* ------------------------- CONFIG ---------------------------- */
+    const API_BASE = "https://occurrence-problems-consistent-franklin.trycloudflare.com/api";
 
     const conductorData = JSON.parse(localStorage.getItem("conductor"));
     const conductorId   = conductorData?.id || null;
@@ -119,41 +162,32 @@
       if (bearer) h["Authorization"] = "Bearer " + bearer;
       return h;
     }
+    
     function fmtDateTime(s){
       if(!s) return "-";
       const d = new Date(s);
       return isNaN(+d) ? "-" : d.toLocaleString();
     }
 
-    /* -------------------------
-       3) Mapeo NOMBRE → COORDENADAS
-          ✱ EDITA AQUÍ LAS COORDENADAS ✱
-          Formato: 'nombre normalizado': [lat, lng]
-          (normalizado = sin tildes, en minúsculas)
-    ------------------------- */
+    /* ------------------------ COORDENADAS ------------------------ */
     const PLACE_COORDS = {
-      'hotel vitacura':   [-33.4072823524958, -70.59858727667945],  // TODO: reemplazar por coordenadas reales
-      'hotel el bosque':  [-33.41635607885289, -70.60137591439829],  // TODO: reemplazar por coordenadas reales
-      'club de tenis':    [-33.39625408309244, -70.50415154436472]   // TODO: tercer lugar (ejemplo)
+      'hotel vitacura': [-33.4072823524958, -70.59858727667945],
+      'hotel el bosque': [-33.41635607885289, -70.60137591439829],
+      'club de tenis': [-33.39625408309244, -70.50415154436472]
     };
 
     function normalize(s){
-      return (s || '')
-        .toString()
-        .toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-        .trim();
+      return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
     }
+
     function lookupLatLng(name){
-      const key = normalize(name);
-      const arr = PLACE_COORDS[key];
-      return Array.isArray(arr) && arr.length === 2 ? `${arr[0]},${arr[1]}` : '';
+      const arr = PLACE_COORDS[normalize(name)];
+      return Array.isArray(arr) ? `${arr[0]},${arr[1]}` : '';
     }
+
     function escAttr(s){ return (s||'').replace(/"/g,'&quot;'); }
 
-    /* -------------------------
-       4) Render tabla
-    ------------------------- */
+    /* ------------------------- BOTONES + ESTADOS ------------------ */
     function makeRow(v){
       const id      = v.id ?? "—";
       const origenT = v.solicitud_origen || v.solicitud?.origen?.salida || "—";
@@ -161,19 +195,43 @@
       const fecha   = fmtDateTime(v.fecha_hora_agendada || v.fecha_hora);
       const estado  = (v.estado || "—").toString().toUpperCase();
 
-      // Coordenadas por nombre (si existen)
       const originLL = lookupLatLng(origenT);
       const destLL   = lookupLatLng(destinoT);
 
-      const btn = (estado === "ASIGNADA")
-        ? `<button class="btn secondary btn-sm"
-             data-action="maps"
-             data-origin="${escAttr(originLL)}"
-             data-dest="${escAttr(destLL)}"
-             data-origin-text="${escAttr(origenT)}"
-             data-dest-text="${escAttr(destinoT)}"
-             data-mode="driving">Iniciar viaje</button>`
-        : `<span class="muted">${estado}</span>`;
+      let botones = "";
+
+      if(estado === "ASIGNADA"){
+        botones = `
+          <button class="btn-action btn-start"
+            data-action="maps"
+            data-id="${id}"
+            data-origin="${escAttr(originLL)}"
+            data-dest="${escAttr(destLL)}"
+            data-origin-text="${escAttr(origenT)}"
+            data-dest-text="${escAttr(destinoT)}"
+            data-mode="driving"
+            data-next="EN_CURSO"
+          >Iniciar viaje</button>
+
+          <button class="btn-action btn-end"
+            data-action="estado"
+            data-id="${id}"
+            data-estado="COMPLETADA"
+          >Finalizar viaje</button>
+        `;
+      }
+      else if(estado === "EN_CURSO"){
+        botones = `
+          <button class="btn-action btn-end"
+            data-action="estado"
+            data-id="${id}"
+            data-estado="COMPLETADA"
+          >Finalizar viaje</button>
+        `;
+      }
+      else {
+        botones = `<span class="muted">${estado}</span>`;
+      }
 
       return `
         <tr>
@@ -181,28 +239,36 @@
           <td>${origenT}</td>
           <td>${destinoT}</td>
           <td>${fecha}</td>
-          <td><span class="badge ${estado}">${estado}</span></td>
-          <td>${btn}</td>
+          <td>
+            <span class="badge ${estado}">
+              ${
+                estado === "EN_CURSO" ? "En curso" :
+                estado === "COMPLETADA" ? "Completada" :
+                estado
+              }
+            </span>
+          </td>
+          <td>${botones}</td>
         </tr>
       `;
     }
 
-    /* -------------------------
-       5) Abrir Google Maps con coordenadas
-          Usa lat,lng cuando están disponibles;
-          si no, cae a texto (búsqueda de Maps).
-    ------------------------- */
+    /* ------------------------ GOOGLE MAPS ------------------------- */
     document.addEventListener('click', (ev) => {
       const el = ev.target.closest('[data-action="maps"]');
       if(!el) return;
 
-      const originLL = (el.getAttribute('data-origin') || '').trim();      // "lat,lng" o ""
-      const destLL   = (el.getAttribute('data-dest')   || '').trim();      // "lat,lng" o ""
-      const oText    = (el.getAttribute('data-origin-text') || '').trim(); // fallback por texto
-      const dText    = (el.getAttribute('data-dest-text')   || '').trim();
-      const mode     = (el.getAttribute('data-mode') || 'driving');
+      const id       = el.dataset.id;
+      const newState = el.dataset.next;
 
-      // destino es obligatorio (coordenadas o texto)
+      cambiarEstado(id, newState); // Marca EN_CURSO
+
+      const originLL = el.dataset.origin;
+      const destLL   = el.dataset.dest;
+      const oText    = el.dataset.originText;
+      const dText    = el.dataset.destText;
+      const mode     = el.dataset.mode;
+
       const destination = destLL || dText;
       if (!destination){
         alert("Este viaje no tiene destino definido.");
@@ -216,15 +282,51 @@
       window.open(url, "_blank", "noopener");
     });
 
-    /* -------------------------
-       6) Cargar viajes
-    ------------------------- */
+    /* ------------------------ CAMBIO DE ESTADO -------------------- */
+    async function cambiarEstado(id, nuevoEstado){
+      try {
+        const res = await fetch(`${API_BASE}/reservas/${id}/`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            ...headersJSON()
+          },
+          body: JSON.stringify({ estado: nuevoEstado })
+        });
+
+        if(!res.ok){
+          throw new Error("HTTP " + res.status);
+        }
+
+        cargarViajes();
+
+      } catch (err) {
+        alert("Error cambiando estado: " + err.message);
+      }
+    }
+
+    document.addEventListener("click", (ev)=>{
+      const btn = ev.target.closest("[data-action='estado']");
+      if(!btn) return;
+
+      const id = btn.dataset.id;
+      const estado = btn.dataset.estado;
+
+      cambiarEstado(id, estado);
+    });
+
+    /* ------------------------ CARGAR VIAJES ------------------------ */
     async function cargarViajes() {
       $tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">Cargando viajes...</td></tr>`;
       $status.textContent = "Cargando…";
+
       try {
-        const res = await fetch(`${API_BASE}/reservas/?conductor=${encodeURIComponent(conductorId)}`, { headers: headersJSON() });
+        const res = await fetch(`${API_BASE}/reservas/?conductor=${encodeURIComponent(conductorId)}`, {
+          headers: headersJSON()
+        });
+
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
         const data = await res.json();
         const viajes = Array.isArray(data?.results) ? data.results : (Array.isArray(data) ? data : []);
 
@@ -236,6 +338,7 @@
 
         $tbody.innerHTML = viajes.map(makeRow).join("");
         $status.textContent = `${viajes.length} viaje(s)`;
+
       } catch (err) {
         console.error("Error al cargar viajes:", err);
         $tbody.innerHTML = `<tr><td colspan="6" style="color:red;text-align:center;">Error cargando viajes (${err.message})</td></tr>`;
@@ -243,9 +346,7 @@
       }
     }
 
-    /* -------------------------
-       7) Logout e init
-    ------------------------- */
+    /* ------------------------- LOGOUT ----------------------------- */
     document.getElementById('btn-logout').addEventListener('click', () => {
       localStorage.removeItem("conductor");
       localStorage.removeItem("conductor_token");
@@ -254,6 +355,5 @@
     cargarViajes();
   </script>
 
-  <script src="/js/coordinador.js"></script>
 </body>
 </html>

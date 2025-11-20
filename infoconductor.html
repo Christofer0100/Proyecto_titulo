@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Mi cuenta</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="css/cdr.css">
+</head>
+
+<body>
+  <div class="container">
+    <aside>
+      <div class="toggle">
+        <div class="logo">
+          <img src="/imagenes/ImagenChileOpen.png" alt="logo">
+        </div>
+        <div class="close" id="close-btn"><span class="material-icons-sharp">close</span></div>
+      </div>
+
+      <div class="sidebar">
+        <a href="infoconductor.html" class="active">
+          <span class="material-icons-sharp">person_outline</span>
+          <h3>Mi información</h3>
+        </a>
+
+        <a href="panelconductor.html">
+          <span class="material-icons-sharp">directions_car</span>
+          <h3>Mis Viajes</h3>
+        </a>
+
+        <a href="loginconductor.html" id="btn-logout">
+          <span class="material-icons-sharp">logout</span>
+          <h3>Cerrar Sesión</h3>
+        </a>
+      </div>
+    </aside>
+
+    <main>
+      <h1>Mi cuenta</h1>
+
+      <div class="recent-orders">
+        <div class="card">
+          <div class="table-wrap">
+            <table id="tbl-conductor" aria-label="Información del conductor">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Patente</th>
+                  <th>Mail</th>
+                  <th>Teléfono</th>
+                  <th>Activo</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-info">
+                <!-- JS lo rellena -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div class="right-section">
+      <div class="nav">
+        <button id="menu-btn"><span class="material-icons-sharp">menu</span></button>
+
+        <div id="theme-toggle" class="dark-mode" role="button" aria-label="Cambiar tema">
+          <span class="material-icons-sharp" data-theme-target="light">light_mode</span>
+          <span class="material-icons-sharp" data-theme-target="dark">dark_mode</span>
+        </div>
+
+        <div class="profile">
+          <div class="info">
+            <p>Hola, <b id="driverName">Conductor</b></p>
+            <small class="text-muted">¡Buen viaje!</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== JS ========== -->
+<script>
+  /* ===== TEMA ===== */
+  (function themeInit(){
+    const el = document.getElementById('theme-toggle');
+    const sun  = el.querySelector('[data-theme-target="light"]');
+    const moon = el.querySelector('[data-theme-target="dark"]');
+
+    function apply(theme){
+      document.body.classList.toggle('dark-mode-variables', theme === 'dark');
+      sun.classList.toggle('active', theme === 'light');
+      moon.classList.toggle('active', theme === 'dark');
+      localStorage.setItem('theme', theme);
+    }
+
+    apply(localStorage.getItem('theme') || 'light');
+
+    el.addEventListener('click', () => {
+      const next = document.body.classList.contains('dark-mode-variables') ? 'light' : 'dark';
+      apply(next);
+    });
+  })();
+
+
+  /* ===== Obtener datos desde localStorage ===== */
+  const conductorLocal = JSON.parse(localStorage.getItem("conductor"));
+  const token = localStorage.getItem("conductor_token");
+
+  if (!conductorLocal) {
+    alert("Debe iniciar sesión nuevamente.");
+    window.location.href = "loginconductor.html";
+  }
+
+  const $tbodyInfo = document.getElementById("tbody-info");
+  const $driverName = document.getElementById("driverName");
+
+
+  /* ===== Colocar saludo ===== */
+  const nombreCompleto = [conductorLocal.nombre, conductorLocal.apellido]
+    .filter(Boolean)
+    .join(" ");
+
+  $driverName.textContent = nombreCompleto || "Conductor";
+
+
+  /* ===== Fetch conductor completo desde API ===== */
+  const API_BASE = "https://occurrence-problems-consistent-franklin.trycloudflare.com/api";
+
+  async function fetchConductorCompleto() {
+
+    try {
+      const res = await fetch(`${API_BASE}/conductores/${conductorLocal.id}/`, {
+        headers: {
+          "Accept": "application/json",
+          ...(token ? { "Authorization": "Bearer " + token } : {})
+        }
+      });
+
+      if (!res.ok) throw new Error("Error al cargar datos del conductor");
+
+      const c = await res.json();
+
+      renderInfo(c);
+
+    } catch (error) {
+      console.error(error);
+      $tbodyInfo.innerHTML = `
+        <tr><td colspan="5" style="color:red;text-align:center;padding:20px;">
+          Error cargando datos
+        </td></tr>`;
+    }
+  }
+
+
+  /* ===== Pintar tabla ===== */
+  function renderInfo(c) {
+    $tbodyInfo.innerHTML = `
+      <tr>
+        <td>${c.nombre} ${c.apellido}</td>
+        <td>${c.patente ?? "-"}</td>
+        <td>${c.mail ?? c.email ?? "-"}</td>
+        <td>${c.telefono ?? "-"}</td>
+        <td><span class="pill ok">${c.activo ? "Sí" : "No"}</span></td>
+      </tr>
+    `;
+  }
+
+  /* ===== INIT ===== */
+  fetchConductorCompleto();
+
+
+  /* ===== LOGOUT ===== */
+  document.getElementById("btn-logout").addEventListener("click", () => {
+    localStorage.removeItem("conductor");
+    localStorage.removeItem("conductor_token");
+  });
+</script>
+
+
+  <script src="/js/coordinador.js"></script>
+</body>
+</html>

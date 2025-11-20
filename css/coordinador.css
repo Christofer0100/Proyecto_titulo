@@ -138,10 +138,11 @@ aside .toggle .logo{
 }
 
 aside .toggle .logo img{
-    width: 2rem;
-    height: 2rem;
+    width: 175px;        /* tamaño ideal de logo para sidebar */
+    height: auto;        /* mantiene proporción */
+    margin-top: 0;       /* antes te empujaba el layout hacia abajo */
+    object-fit: contain; /* evita deformaciones si el logo es ancho */
 }
-
 aside .toggle .close{
     padding-right: 1rem;
     display: none;

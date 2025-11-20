@@ -51,8 +51,7 @@
     <aside>
       <div class="toggle">
         <div class="logo">
-          <img src="/imagenes/3.jpg" alt="">
-          <h2><span class="primary">ATP</span></h2>
+          <img src="/imagenes/ImagenChileOpen.png" alt="">
         </div>
         <div class="close" id="close-btn">
           <span class="material-icons-sharp">close</span>
@@ -451,46 +450,58 @@
   </script>
 
   <!-- Nombre del coordinador -->
-  <script>
-    const API_BASE = 'https://soundtrack-discount-frozen-obtaining.trycloudflare.com/api';
-    const TOKEN = localStorage.getItem('coord_token') || '';
+<script>
+  const API_BASE = 'https://occurrence-problems-consistent-franklin.trycloudflare.com/api';
+  const TOKEN = localStorage.getItem('coord_token') || '';
 
-    function headersJSON(){
-      const h = { 'Accept':'application/json' };
-      if(TOKEN) h['Authorization'] = 'Token '+TOKEN;
-      return h;
-    }
+  function headersJSON(){
+    const h = { 'Accept':'application/json' };
+    if (TOKEN) h['Authorization'] = 'Bearer ' + TOKEN;
+    return h;
+  }
 
-    async function fetchJSON(url){
-      const r = await fetch(url, { headers: headersJSON() });
-      if(!r.ok) throw new Error(`HTTP ${r.status}`);
-      return r.json();
-    }
+  async function fetchJSON(url){
+    const r = await fetch(url, { headers: headersJSON() });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json();
+  }
 
-    async function cargarCoordinador(){
-      const el = document.getElementById('coordinadorNombre');
-      const urls=[
-        `${API_BASE}/coordinadores/me/`,
-        `${API_BASE}/coordinadores/?activo=true`,
-        `${API_BASE}/coordinadores/`
-      ];
-      for(const u of urls){
-        try{
-          const d = await fetchJSON(u);
-          let it=null;
-          if(Array.isArray(d?.results) && d.results.length) it=d.results[0];
-          else if(Array.isArray(d) && d.length) it=d[0];
-          else if(d && typeof d==='object') it=d;
-          if(it){
-            const nombre=[it.nombre, it.apellido].filter(Boolean).join(' ')||it.nombre||it.user||null;
-            if(nombre){ el.textContent=nombre; return; }
+  async function cargarCoordinador(){
+    const el = document.getElementById('coordinadorNombre');
+
+    const urls = [
+      `${API_BASE}/coordinadores/me/`,
+      `${API_BASE}/coordinadores/?activo=true`,
+      `${API_BASE}/coordinadores/`
+    ];
+
+    for(const u of urls){
+      try{
+        const d = await fetchJSON(u);
+        let it = null;
+
+        if (Array.isArray(d?.results) && d.results.length) it = d.results[0];
+        else if (Array.isArray(d) && d.length) it = d[0];
+        else if (typeof d === 'object') it = d;
+
+        if (it){
+          const nombre = [it.nombre, it.apellido].filter(Boolean).join(' ') || it.nombre || it.user;
+          if (nombre){
+            el.textContent = nombre;
+            localStorage.setItem("coord_name", nombre);
+            return;
           }
-        }catch(_){}
-      }
-      el.textContent = 'Coordinador';
+        }
+      }catch(_){}
     }
-    cargarCoordinador();
-  </script>
+
+    // fallback
+    el.textContent = "Coordinador";
+  }
+
+  cargarCoordinador();
+</script>
+
 
   <!-- Toggle Tema -->
   <script>

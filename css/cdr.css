@@ -300,7 +300,12 @@ select:focus, input[type="datetime-local"]:focus{
 aside{ height:100vh; }
 aside .toggle{ display:flex; align-items:center; justify-content:space-between; margin-top:1.4rem; }
 aside .toggle .logo{ display:flex; gap:0.5rem; }
-aside .toggle .logo img{ width:2rem; height:2rem; margin-top:1.4rem; }
+aside .toggle .logo img{
+    width: 175px;        /* tamaño ideal de logo para sidebar */
+    height: auto;        /* mantiene proporción */
+    margin-top: 0;       /* antes te empujaba el layout hacia abajo */
+    object-fit: contain; /* evita deformaciones si el logo es ancho */
+}
 aside .toggle .close{ padding-right:1rem; display:none; }
 aside .sidebar{
     display:flex; flex-direction:column; background-color: var(--color-white);
@@ -545,4 +550,31 @@ dialog::backdrop {
 /* Limitar el ancho del input de hora */
 #lblHora {
   max-width: 120px;
+}
+
+
+.badge.EN_CURSO {
+    background: #F7D060 !important;   /* Amarillo elegante */
+    border-color: #F7D060 !important;
+    color: #000 !important;
+}
+
+.badge.COMPLETADA {
+    background: #ff0000 !important;   /* Verde diferente a ASIGNADA */
+    border-color: #ff0000 !important;
+    color: #fff !important;
+}
+
+/* Opcional pero recomendado */
+.badge.CANCELADA,
+.badge.RECHAZADA {
+    background: #d64545 !important;   /* Rojo elegante */
+    border-color: #d64545 !important;
+    color: #fff !important;
+}
+
+/* Para consistencia visual con las badges nuevas */
+.badge {
+    font-weight: 600;
+    letter-spacing: 0.2px;
 }

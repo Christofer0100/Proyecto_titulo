@@ -230,9 +230,10 @@ aside .toggle .logo{
 }
 
 aside .toggle .logo img{
-    width: 2rem;
-    height: 2rem;
-    margin-top: 1.4rem;
+    width: 175px;        /* tamaño ideal de logo para sidebar */
+    height: auto;        /* mantiene proporción */
+    margin-top: 0;       /* antes te empujaba el layout hacia abajo */
+    object-fit: contain; /* evita deformaciones si el logo es ancho */
 }
 
 aside .toggle .close{
@@ -689,4 +690,44 @@ main .recent-orders a{
         font-size: 2rem;
     }
 
+}
+/* ==========================================
+   BADGES TRANSPARENTES (ESTILO SOLICITUDES)
+   ========================================== */
+
+.badge {
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: .78rem;
+  font-weight: 600;
+  background: transparent;            /* TRANSPARENTE */
+  border: 1px solid var(--border-strong);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+/* COMPLETADA → texto verde, borde tenue */
+.badge.COMPLETADA {
+  color: #4CAF50;
+  border-color: #4CAF50;
+}
+
+/* EN CURSO → texto amarillo, borde tenue */
+.badge.EN_CURSO {
+  color: #F7D060;
+  border-color: #F7D060;
+}
+
+/* ASIGNADA → texto verde petróleo */
+.badge.ASIGNADA {
+  color: #1B9C85;
+  border-color: #1B9C85;
+}
+
+/* Soporte modo oscuro */
+:root[data-theme="dark"] .badge {
+  background: transparent;
+  border-color: var(--border-strong);
 }
